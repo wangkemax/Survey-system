@@ -14,3 +14,7 @@ screenshot_*.js
 # 敏感数据 — 真实客户数据不入库
 cases/**/raw_data/
 *.local.md
+
+# 项目压缩包不入库
+survey-system.zip
+*.zip
