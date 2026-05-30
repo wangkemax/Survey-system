@@ -1355,6 +1355,61 @@
       ※ 残值率 = 假设 3-5 年后迁移时的二手回收价值占原价比例；软件投资可 100% 迁移。
       ※ 软硬比例：软件层 26% · 设备层 69% · 改造层 5% ← 软件层占比上升 — 投资规模缩减时软件不变，更体现"软件重"。
     </p>
+
+    <!-- ===== 投资测算器（参数化 · 改 SKU/面积自动重算）===== -->
+    <div style="margin-top:22px;border:1px solid var(--line,#e3d6bb);border-radius:14px;overflow:hidden;">
+      <div style="background:var(--navy,#1A2B4A);color:#fff;padding:12px 16px;font-weight:700;font-size:15px;">
+        🧮 投资测算器（参数化）<span style="font-weight:400;font-size:12px;opacity:.8;"> · 改 SKU 数 / 面积自动重算</span>
+      </div>
+      <div style="padding:16px;background:var(--cream,#FBF5E9);">
+        <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;">
+          <label style="font-size:13px;color:var(--navy,#1A2B4A);font-weight:600;">
+            SKU 规模（种）<br>
+            <input id="inv-sku" type="number" inputmode="numeric" value="6800" min="100" step="100"
+              style="margin-top:5px;width:130px;padding:8px;border:1px solid #ccbf9f;border-radius:8px;font-size:15px;">
+          </label>
+          <label style="font-size:13px;color:var(--navy,#1A2B4A);font-weight:600;">
+            作业面积（㎡）<br>
+            <input id="inv-area" type="number" inputmode="numeric" value="4387" min="200" step="100"
+              style="margin-top:5px;width:130px;padding:8px;border:1px solid #ccbf9f;border-radius:8px;font-size:15px;">
+          </label>
+          <button id="inv-reset" type="button"
+            style="padding:8px 14px;border:1px solid #ccbf9f;border-radius:8px;background:#fff;color:var(--navy,#1A2B4A);font-weight:600;cursor:pointer;">恢复基线</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px;">
+          <div style="background:#fff;border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:11px;color:#8a7a58;font-weight:600;">软件层</div>
+            <div id="inv-sw" style="font-size:20px;font-weight:800;color:var(--navy,#1A2B4A);">—</div>
+          </div>
+          <div style="background:#fff;border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:11px;color:#8a7a58;font-weight:600;">设备层</div>
+            <div id="inv-eq" style="font-size:20px;font-weight:800;color:var(--navy,#1A2B4A);">—</div>
+          </div>
+          <div style="background:#fff;border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:11px;color:#8a7a58;font-weight:600;">改造层</div>
+            <div id="inv-rt" style="font-size:20px;font-weight:800;color:var(--navy,#1A2B4A);">—</div>
+          </div>
+          <div style="background:var(--gold,#E89B3D);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:11px;color:#fff;font-weight:600;">总投资估算</div>
+            <div id="inv-total" style="font-size:20px;font-weight:800;color:#fff;">—</div>
+            <div id="inv-band" style="font-size:11px;color:#fff;opacity:.9;">—</div>
+          </div>
+        </div>
+
+        <!-- 数据假设与置信度 -->
+        <details style="margin-top:14px;font-size:12.5px;color:var(--text-lt,#6b5d3f);">
+          <summary style="cursor:pointer;font-weight:700;color:var(--navy,#1A2B4A);">数据假设与置信度（点击展开）</summary>
+          <ul style="margin:8px 0 0;padding-left:18px;line-height:1.7;">
+            <li><b>基线</b>：SKU 6,800 种、作业面积 4,387 ㎡ → 软件 300 万 / 设备 810 万 / 改造 55 万 / 合计 1,165 万。</li>
+            <li><b>软件层</b>：≈ 固定 300 万，不随 SKU 线性增长（多客户/多产线时酌增，本测算按固定处理）。<b>置信度：中</b>。</li>
+            <li><b>设备层</b>：40% 固定 + 60% 随 SKU 缩放，公式 810×(0.40+0.60×SKU/6800)。<b>置信度：中低</b>（实际受订单行数/批次复杂度影响）。</li>
+            <li><b>改造层</b>：50% 固定 + 50% 随面积缩放，公式 55×(0.50+0.50×面积/4387)。<b>置信度：低</b>（强依赖现场物理条件）。</li>
+            <li><b>区间</b>：总投资按 ±20% 给出上下限。<b>最终金额以详细方案与供应商报价为准。</b></li>
+          </ul>
+        </details>
+      </div>
+    </div>
   </section>
 
   <!-- ============ Section 5: 分期实施 ============ -->
@@ -1478,5 +1533,29 @@
   <p style="opacity:0.6;font-size:11px;">本文件基于现场调研数据 + 业务模式分析。最终方案以详细技术评审为准。</p>
 </footer>
 
+<script>
+(function(){
+  var SKU0=6800, AREA0=4387, SW0=300, EQ0=810, RT0=55;
+  function fmt(v){ return '≈ ' + Math.round(v).toLocaleString('zh-CN') + ' 万'; }
+  function calc(){
+    var sku=parseFloat(document.getElementById('inv-sku').value)||SKU0;
+    var area=parseFloat(document.getElementById('inv-area').value)||AREA0;
+    var sw=SW0;
+    var eq=EQ0*(0.40+0.60*sku/SKU0);
+    var rt=RT0*(0.50+0.50*area/AREA0);
+    var total=sw+eq+rt;
+    document.getElementById('inv-sw').textContent=fmt(sw);
+    document.getElementById('inv-eq').textContent=fmt(eq);
+    document.getElementById('inv-rt').textContent=fmt(rt);
+    document.getElementById('inv-total').textContent=fmt(total);
+    document.getElementById('inv-band').textContent='±20%：'+Math.round(total*0.8).toLocaleString('zh-CN')+'–'+Math.round(total*1.2).toLocaleString('zh-CN')+' 万';
+  }
+  ['inv-sku','inv-area'].forEach(function(id){ document.getElementById(id).addEventListener('input',calc); });
+  document.getElementById('inv-reset').addEventListener('click',function(){
+    document.getElementById('inv-sku').value=SKU0; document.getElementById('inv-area').value=AREA0; calc();
+  });
+  calc();
+})();
+</script>
 </body>
 </html>

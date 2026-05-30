@@ -860,6 +860,15 @@
       <label>天气 / 现场状况</label>
       <input type="text" id="meta-weather" placeholder="晴 / 业务繁忙" />
     </div>
+    <div class="meta-item">
+      <label>行业模板</label>
+      <select id="meta-industry" style="width:100%;padding:9px 8px;border:1px solid var(--line,#d9cbb2);border-radius:8px;font-size:14px;background:#fff;color:var(--navy,#1A2B4A);font-weight:600;">
+        <option value="autoparts">工程机械配件</option>
+        <option value="ecommerce">电商仓</option>
+        <option value="pharma">医药仓</option>
+        <option value="vehicle">汽车整车件</option>
+      </select>
+    </div>
   </div>
 
   <nav class="tabs" role="tablist">
@@ -1039,7 +1048,10 @@
     </div>
     <div class="modal-foot">
       <button class="modal-btn secondary" id="copy-btn">复制内容</button>
+      <button class="modal-btn secondary" id="json-btn">下载 JSON</button>
+      <button class="modal-btn secondary" id="merge-btn">合并 deep 数据</button>
       <button class="modal-btn primary" id="download-btn">下载 .md</button>
+      <input type="file" id="merge-file" accept=".json,.md,application/json" style="display:none;">
     </div>
   </div>
 </div>
@@ -1083,16 +1095,32 @@ const DEFAULT_STATIONS = [
   { id: 's11', name: '库存查询 · 账卡登记', auto: false },
 ];
 
-// 7 个评分维度（新增可迁移性 — 通用方案核心考量）
-const DIMENSIONS = [
-  { key: 'labor',    name: '人力成本',    hint: '工时长 / 人数多 / 加班多 = 高分' },
-  { key: 'repeat',   name: '重复度',      hint: '动作高度重复 = 高分' },
-  { key: 'error',    name: '错误率',      hint: '人工易出错、影响质量 = 高分' },
-  { key: 'speed',    name: '速度瓶颈',    hint: '是流程瓶颈、影响时效 = 高分' },
-  { key: 'tech',     name: '技术成熟度',  hint: '市场有成熟方案、案例多 = 高分' },
-  { key: 'roi',      name: 'ROI 可行性',  hint: '投入产出比好、回收期短 = 高分' },
-  { key: 'movable',  name: '可迁移性',    hint: '设备标准化 / 残值高 / 易拆装 = 高分' },
-];
+// ===== 行业模板：切换不同评分维度（评分维度可配置化）=====
+const DIM = {
+  labor:    { key:'labor',    name:'人力成本',     hint:'工时长 / 人数多 / 加班多 = 高分' },
+  repeat:   { key:'repeat',   name:'重复度',       hint:'动作高度重复 = 高分' },
+  error:    { key:'error',    name:'错误率',       hint:'人工易出错、影响质量 = 高分' },
+  speed:    { key:'speed',    name:'速度瓶颈',     hint:'是流程瓶颈、影响时效 = 高分' },
+  tech:     { key:'tech',     name:'技术成熟度',   hint:'市场有成熟方案、案例多 = 高分' },
+  roi:      { key:'roi',      name:'ROI 可行性',   hint:'投入产出比好、回收期短 = 高分' },
+  movable:  { key:'movable',  name:'可迁移性',     hint:'设备标准化 / 残值高 / 易拆装 = 高分' },
+  peak:     { key:'peak',     name:'峰值波动',     hint:'大促/爆款波动大、峰谷悬殊 = 高分' },
+  returns:  { key:'returns',  name:'退货处理',     hint:'退货量大、逆向流程重 = 高分' },
+  coldchain:{ key:'coldchain',name:'冷链合规',     hint:'温控要求高、合规压力大 = 高分' },
+  expiry:   { key:'expiry',   name:'效期/批次追溯', hint:'效期管理严、批次追溯强 = 高分' },
+  lineside: { key:'lineside', name:'线边配送精度',  hint:'工位级配送、节拍精度高 = 高分' },
+};
+const INDUSTRY_TEMPLATES = {
+  autoparts: { name:'工程机械配件', dims:['labor','repeat','error','speed','tech','roi','movable'] },
+  ecommerce: { name:'电商仓',       dims:['labor','repeat','peak','returns','speed','roi','movable'] },
+  pharma:    { name:'医药仓',       dims:['labor','error','coldchain','expiry','tech','roi','movable'] },
+  vehicle:   { name:'汽车整车件',   dims:['labor','repeat','error','lineside','speed','roi','movable'] },
+};
+function dimsOf(key){ return (INDUSTRY_TEMPLATES[key]||INDUSTRY_TEMPLATES.autoparts).dims.map(k=>DIM[k]); }
+// 当前生效维度（由行业模板驱动），默认工程机械配件
+let DIMENSIONS = dimsOf('autoparts');
+function maxScore(){ return DIMENSIONS.length * 5; }
+function applyIndustry(){ DIMENSIONS = dimsOf((state.meta && state.meta.industry) || 'autoparts'); }
 
 // 物理约束项 — 已按"通用可迁移方案"调整：弱化 ASRS 类约束，强化 AGV / 轻型货架 / 业主方改造许可
 const PHYS_BUILDING = [
@@ -1140,9 +1168,10 @@ const ALL_PHYS = [...PHYS_BUILDING, ...PHYS_PASSAGE, ...PHYS_ENV, ...PHYS_NETWOR
    状态管理（含 LocalStorage 持久化）
    =================================================== */
 const STORAGE_KEY = 'warehouse_survey_v2';
+const TOOL_ID = 'site_survey';
 
 let state = {
-  meta: { date:'', surveyor:'', contact:'', weather:'' },
+  meta: { date:'', surveyor:'', contact:'', weather:'', industry:'autoparts' },
   stations: JSON.parse(JSON.stringify(DEFAULT_STATIONS)),
   scores: {}, // { stationId: { labor:0, repeat:0, ... } }
   oppNotes: '',
@@ -1208,6 +1237,7 @@ document.querySelectorAll('.tab').forEach(btn => {
    元信息绑定
    =================================================== */
 function bindMeta() {
+  applyIndustry();
   ['date','surveyor','contact','weather'].forEach(k => {
     const el = document.getElementById('meta-' + k);
     el.value = state.meta[k] || '';
@@ -1216,6 +1246,19 @@ function bindMeta() {
       saveState();
     });
   });
+  // 行业模板选择
+  const indSel = document.getElementById('meta-industry');
+  if (indSel) {
+    indSel.value = state.meta.industry || 'autoparts';
+    indSel.addEventListener('change', () => {
+      state.meta.industry = indSel.value;
+      applyIndustry();
+      saveState();
+      renderOpportunities();
+      renderRanking();
+      toast('已切换：' + ((INDUSTRY_TEMPLATES[indSel.value]||{}).name || ''));
+    });
+  }
   // 默认填今天
   if (!state.meta.date) {
     const today = new Date();
@@ -1271,7 +1314,7 @@ function renderOpportunities() {
       <div class="card-head">
         <div class="card-title">${st.name}</div>
         ${delBtn}
-        <div class="card-score">${total}<span class="max">/35</span></div>
+        <div class="card-score">${total}<span class="max">/${maxScore()}</span></div>
       </div>
       <div class="card-hint">${filled === DIMENSIONS.length
           ? '<span style="color:var(--green);font-weight:700;">✓ 评分完成</span>'
@@ -1564,7 +1607,8 @@ function buildMarkdown() {
   md += `- **调研日期**：${m.date || '—'}\n`;
   md += `- **调研人员**：${m.surveyor || '—'}\n`;
   md += `- **对接人**：${m.contact || '—'}\n`;
-  md += `- **天气/现场**：${m.weather || '—'}\n\n`;
+  md += `- **天气/现场**：${m.weather || '—'}\n`;
+  md += `- **行业模板**：${(INDUSTRY_TEMPLATES[m.industry]||INDUSTRY_TEMPLATES.autoparts).name}\n\n`;
   md += '---\n\n';
 
   // ========== Part 1: 自动化机会 ==========
@@ -1583,18 +1627,21 @@ function buildMarkdown() {
     md += '*尚未评估任何工位*\n\n';
   } else {
     md += '### 优先级排序（综合分越高 = 越值得自动化）\n\n';
-    md += '| 排名 | 工位 | 综合分 | 人力 | 重复 | 错误 | 速度 | 技术 | ROI | 迁移 |\n';
-    md += '|:---:|:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|\n';
+    const dimCols = DIMENSIONS.map(d => d.name).join(' | ');
+    const dimSep = DIMENSIONS.map(() => ':---:').join('|');
+    md += `| 排名 | 工位 | 综合分 | ${dimCols} |\n`;
+    md += `|:---:|:---|:---:|${dimSep}|\n`;
     ranked.forEach((s, i) => {
       const sc = s.scores;
-      md += `| ${i+1} | ${s.name} | **${s.total} / 35** | ${sc.labor||'-'} | ${sc.repeat||'-'} | ${sc.error||'-'} | ${sc.speed||'-'} | ${sc.tech||'-'} | ${sc.roi||'-'} | ${sc.movable||'-'} |\n`;
+      const vals = DIMENSIONS.map(d => sc[d.key] || '-').join(' | ');
+      md += `| ${i+1} | ${s.name} | **${s.total} / ${maxScore()}** | ${vals} |\n`;
     });
     md += '\n';
 
     // TOP 3 强调
     md += '### 自动化优先推进 TOP 3\n\n';
     ranked.slice(0, 3).forEach((s, i) => {
-      md += `**🎯 NO.${i+1} ${s.name}** — 综合分 ${s.total}/35\n\n`;
+      md += `**🎯 NO.${i+1} ${s.name}** — 综合分 ${s.total}/${maxScore()}\n\n`;
     });
   }
 
@@ -1742,7 +1789,7 @@ function buildMarkdown() {
       } else {
         recommend = '— 需详细方案讨论';
       }
-      md += `| ${s.name} | ${s.total}/35 | ${mv}/5 | ${recommend} |\n`;
+      md += `| ${s.name} | ${s.total}/${maxScore()} | ${mv}/5 | ${recommend} |\n`;
     });
     md += '\n';
   }
@@ -1821,6 +1868,41 @@ document.getElementById('download-btn').addEventListener('click', () => {
   toast('已下载 ' + filename);
 });
 
+// ===== 数据结构打通：导出统一 JSON 包 + 合并 deep_survey 数据 =====
+function exportBundle(){
+  return { tool:TOOL_ID, schemaVersion:1, exportedAt:new Date().toISOString(),
+           meta: state.meta, data: state,
+           markdown: (document.getElementById('md-output').textContent || buildMarkdown()) };
+}
+(function(){
+  const jb=document.getElementById('json-btn');
+  if(jb) jb.addEventListener('click', () => {
+    const fname = `仓库调研_${state.meta.date||'undated'}.json`;
+    const blob = new Blob([JSON.stringify(exportBundle(),null,2)], { type:'application/json;charset=utf-8' });
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);document.body.removeChild(a);},100);
+    toast('已下载 '+fname);
+  });
+  const mb=document.getElementById('merge-btn'), mf=document.getElementById('merge-file');
+  if(mb && mf){
+    mb.addEventListener('click', () => mf.click());
+    mf.addEventListener('change', () => {
+      const f=mf.files[0]; if(!f){ return; }
+      const reader=new FileReader();
+      reader.onload=()=>{
+        const raw=String(reader.result||''); let appendMd='';
+        try{ const obj=JSON.parse(raw); appendMd = obj.markdown || ('```json\n'+JSON.stringify(obj.data||obj,null,2)+'\n```'); }
+        catch(e){ appendMd = raw; }
+        const cur=document.getElementById('md-output').textContent;
+        document.getElementById('md-output').textContent = cur + '\n\n---\n\n# 附 · 深度调研报告（合并自 deep_survey）\n\n' + appendMd;
+        toast('已合并 deep 数据 ✓ 可复制/下载');
+      };
+      reader.readAsText(f); mf.value='';
+    });
+  }
+})();
+
 /* ===================================================
    重置 — 使用自定义确认（兼容微信/企业微信等内嵌浏览器）
    =================================================== */
@@ -1851,7 +1933,7 @@ function resetAll() {
   try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
   // 直接重置 state（不依赖 reload，更可靠）
   state = {
-    meta: { date:'', surveyor:'', contact:'', weather:'' },
+    meta: { date:'', surveyor:'', contact:'', weather:'', industry:'autoparts' },
     stations: JSON.parse(JSON.stringify(DEFAULT_STATIONS)),
     scores: {},
     oppNotes: '',

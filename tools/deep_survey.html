@@ -1248,6 +1248,7 @@
     </div>
     <div class="modal-foot">
       <button class="modal-btn secondary" id="copy-btn">复制</button>
+      <button class="modal-btn secondary" id="json-btn">下载 JSON</button>
       <button class="modal-btn primary" id="download-btn">下载 .md</button>
     </div>
   </div>
@@ -1274,6 +1275,7 @@
 
 <script>
 const STORAGE_KEY = 'liugong_deep_survey_v1';
+const TOOL_ID = 'deep_survey';
 
 // 关键数据拉取清单
 const DATA_LIST = [
@@ -1747,6 +1749,24 @@ document.getElementById('download-btn').addEventListener('click', () => {
   }, 100);
   toast('已下载 ' + fname);
 });
+
+// ===== 数据结构打通：导出统一 JSON 包（含结构化 data + 渲染 markdown）=====
+function exportBundle(){
+  return { tool:TOOL_ID, schemaVersion:1, exportedAt:new Date().toISOString(),
+           meta: state.meta, data: state, markdown: buildMarkdown() };
+}
+(function(){
+  const jb=document.getElementById('json-btn');
+  if(!jb) return;
+  jb.addEventListener('click', () => {
+    const fname = `深度调研_${state.meta.date||'undated'}.json`;
+    const blob = new Blob([JSON.stringify(exportBundle(),null,2)], { type:'application/json;charset=utf-8' });
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=fname;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);document.body.removeChild(a);},100);
+    toast('已下载 '+fname);
+  });
+})();
 
 // 重置
 const confirmModal = document.getElementById('confirm-modal');
