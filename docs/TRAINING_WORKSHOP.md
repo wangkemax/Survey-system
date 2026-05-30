@@ -10,8 +10,8 @@
 
 - 每人一部手机，预装/预加载 `site_survey.html`、`deep_survey.html`。
 - 投屏 + 一台电脑开 `layout_solution.html`。
-- 发放：[`docs/USER_GUIDE.md`](USER_GUIDE.md)、[`templates/checklist.xlsx`](../templates/checklist.xlsx)、柳工案例 `cases/liugong/`。
-- 准备一份柳工脱敏数据，供学员跟练录入。
+- 发放：[`docs/USER_GUIDE.md`](USER_GUIDE.md)、[`templates/checklist.xlsx`](../templates/checklist.xlsx)、样板案例 `cases/liugong/`。
+- 准备一份脱敏样板数据，供学员跟练录入。
 
 ---
 
@@ -23,7 +23,7 @@
 
 ### 0:20–1:10 · site_survey 实操（50 分钟）
 - 演示：填元信息 + 行业模板切换。
-- 跟练：照柳工数据完成 7 维评分 + 物理 5 组约束。
+- 跟练：照样板数据完成 7 维评分 + 物理 5 组约束。
 - 重点提示：业主方改造许可（经验 8）、月台 0mm（经验 9）。
 - 产出：每人导出一份 Markdown。
 
@@ -56,7 +56,3 @@
 - [ ] 知道单/行/件的区别和追问方式
 - [ ] 能导出并合并出一份完整报告
 - [ ] 知道案例五件套要建哪些文件
-
----
-
-*维护：桂中海迅 · 仓配自动化项目组 · 2026.05*

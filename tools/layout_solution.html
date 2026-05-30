@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>柳工配件库 · 自动化升级布局方案</title>
+<title>配件库 · 自动化升级布局方案</title>
 <style>
   :root {
     --navy: #1A2B4A;
@@ -618,7 +618,7 @@
 <header class="hero">
   <div class="hero-inner">
     <span class="eyebrow">SOLUTION DESIGN · v0.4 · 2026.05</span>
-    <h1>柳工配件库 · 自动化升级布局方案</h1>
+    <h1>配件库 · 自动化升级布局方案</h1>
     <p class="subtitle">
       基于现场调研数据 + 业务模式分析 + <b style="color:#fff;">3 号线批次锁定约束</b>，
       按「储存 · 搬运 · 拣选 · 复核」环节分解，给出
@@ -630,7 +630,7 @@
       <div class="param-card">
         <div class="label">总作业面积</div>
         <div class="value">4,387<span class="unit">㎡</span></div>
-        <div class="hint">100% 柳工自营业务</div>
+        <div class="hint">100% 自营业务</div>
       </div>
       <div class="param-card">
         <div class="label">梁下净高</div>
@@ -661,8 +661,8 @@
         <h3 style="margin:0;font-size:17px;font-weight:800;color:var(--navy);">业务约束识别  ·  3 号线特殊规则</h3>
       </div>
       <p style="margin:0;font-size:13.5px;color:var(--text-dk);line-height:1.7;">
-        调研发现：<b>柳工 1/2 号线业务不看批次</b>，可走标准货到人模式；
-        <b>柳工 3 号线所有 SKU 必须按指定批次出库</b>，且<b style="color:var(--red);">基本一单一件</b> —
+        调研发现：<b>1/2 号线业务不看批次</b>，可走标准货到人模式；
+        <b>3 号线所有 SKU 必须按指定批次出库</b>，且<b style="color:var(--red);">基本一单一件</b> —
         意味着 3 号线的<b>错件代价极大</b>（整单作废），同一 SKU 不同批次的料盒必须严格隔离。
         因此 B 区被拆为 B1 / B2 两个子区，B2 专用于 3 号线，采用 <b>物理隔离 + AMR 专车 + 双重扫码 + AI 视觉批次识别</b> 的强复核模式。
       </p>
@@ -765,7 +765,7 @@
         <!-- B1 上半：普通拣选 -->
         <rect x="60" y="170" width="320" height="155" fill="url(#zoneB-grad)" rx="6"/>
         <text x="100" y="200" class="zone-label" font-size="16">B1</text>
-        <text x="220" y="205" class="zone-label" font-size="13">柳工 1/2 号线</text>
+        <text x="220" y="205" class="zone-label" font-size="13">1/2 号线</text>
         <text x="220" y="225" class="zone-sub" font-size="11">普通拣选模式  ·  不看批次</text>
         <text x="220" y="252" class="zone-sub">货到人 AMR + 移动料架</text>
         <text x="220" y="272" class="zone-sub">SKU 标准拣选</text>
@@ -781,7 +781,7 @@
         <!-- B2 下半：批次锁定模式（用深一点的色 + 金色边框警示） -->
         <rect x="60" y="335" width="320" height="155" fill="#7A4D1F" stroke="#F5D89C" stroke-width="2" rx="6"/>
         <text x="100" y="365" class="zone-label" font-size="16">B2</text>
-        <text x="220" y="368" class="zone-label" font-size="13">柳工 3 号线 专用</text>
+        <text x="220" y="368" class="zone-label" font-size="13">3 号线 专用</text>
         <!-- 警示标签 -->
         <rect x="155" y="378" width="130" height="18" fill="#F5D89C" rx="3"/>
         <text x="220" y="391" font-size="10" text-anchor="middle" fill="#7A4D1F" font-weight="800">⚠ 一单一件 · 强批次</text>
@@ -890,14 +890,14 @@
           <div class="legend-color" style="background:linear-gradient(135deg,#E89B3D,#B57920);"></div>
           <div class="legend-text">
             <div class="lt">B1 · 普通拣选</div>
-            <div class="ld">柳工 1/2 号线 · AMR 货到人</div>
+            <div class="ld">1/2 号线 · AMR 货到人</div>
           </div>
         </div>
         <div class="legend-item">
           <div class="legend-color" style="background:#7A4D1F;border:2px solid #F5D89C;"></div>
           <div class="legend-text">
             <div class="lt">B2 · <span style="color:var(--red);">批次锁定</span></div>
-            <div class="ld">柳工 3 号线 · 一单一件</div>
+            <div class="ld">3 号线 · 一单一件</div>
           </div>
         </div>
         <div class="legend-item">
@@ -966,11 +966,11 @@
         </div>
       </div>
 
-      <!-- B1 区：柳工 1/2 号线 普通拣选 -->
+      <!-- B1 区：1/2 号线 普通拣选 -->
       <div class="zone-card">
         <div class="zone-card-head zoneB">
           <span class="zone-tag">ZONE B1</span>
-          <h3>柳工 1/2 号线 · 普通拣选</h3>
+          <h3>1/2 号线 · 普通拣选</h3>
           <div class="zone-meta">
             <span>SKU<strong>~900</strong></span>
             <span>面积<strong>~380 ㎡</strong></span>
@@ -1001,7 +1001,7 @@
           </ul>
           <h4>选型依据</h4>
           <div class="zone-rationale">
-            柳工 1/2 号线业务<b>不需要批次锁定</b>，可走标准货到人模式。半月数据显示日均 ~30 单、平均 17 行/单、2.8 件/行 — <b>典型拆零拣选</b>，AMR + 料架将 60% 的走动时间消灭，是 ROI 最高的环节。
+            1/2 号线业务<b>不需要批次锁定</b>，可走标准货到人模式。半月数据显示日均 ~30 单、平均 17 行/单、2.8 件/行 — <b>典型拆零拣选</b>，AMR + 料架将 60% 的走动时间消灭，是 ROI 最高的环节。
           </div>
         </div>
       </div>
@@ -1020,7 +1020,7 @@
         <div class="zone-body">
           <h4>业务特性</h4>
           <div class="zone-rationale" style="background:#FEF3C7;border-color:var(--amber);margin-top:0;margin-bottom:14px;">
-            柳工 3 号线 <b>所有 SKU 必须按指定批次出库</b>。基本一单一件 → 错件代价极大（整单作废）。同一 SKU 不同批次的料盒必须严格物理隔离。
+            3 号线 <b>所有 SKU 必须按指定批次出库</b>。基本一单一件 → 错件代价极大（整单作废）。同一 SKU 不同批次的料盒必须严格物理隔离。
           </div>
           <h4>核心设备</h4>
           <ul class="equip-list">
@@ -1164,7 +1164,7 @@
           </tr>
           <tr>
             <td class="item-name"><b>RFID 龙门架</b><small>必上 · CID/批次/工位多重追溯</small></td>
-            <td>装在发货前最后一关，整车扫描；与柳工 MES 实时回传</td>
+            <td>装在发货前最后一关，整车扫描；与客户 MES 实时回传</td>
             <td>2 套</td>
             <td class="price-cell">≈ 40 万</td>
           </tr>
@@ -1232,7 +1232,7 @@
           </tr>
           <tr>
             <td class="item-name"><b>数据中台 + MES 接口</b></td>
-            <td>与柳工 1/2/3 号线 MES 直连，工位级配送</td>
+            <td>与1/2/3 号线 MES 直连，工位级配送</td>
             <td class="price-cell">60 万</td>
             <td>—</td>
             <td><span class="mov-pill mov-100">100%</span></td>
@@ -1444,8 +1444,8 @@
         <div class="span">第 7–18 个月</div>
         <ul>
           <li><b>A 区</b>：5 层货架 + 托盘 AGV</li>
-          <li><b>B1 区</b>：柳工 1/2 号线 AMR 货到人</li>
-          <li><b>B2 区</b>：柳工 3 号线批次锁定 + AI 视觉复核</li>
+          <li><b>B1 区</b>：1/2 号线 AMR 货到人</li>
+          <li><b>B2 区</b>：3 号线批次锁定 + AI 视觉复核</li>
           <li>集货 + AI 复核 + RFID 龙门架</li>
           <li>液压登车桥安装</li>
           <li>AI 调度系统初步上线</li>
@@ -1478,7 +1478,7 @@
   <section>
     <div class="section-head">
       <h2><span class="num">06</span> ASRS / Shuttle / AMR 选型对比</h2>
-      <div class="desc">回答"为什么柳工不上 ASRS"——三种方案直观对比。</div>
+      <div class="desc">回答"为什么为什么不上 ASRS"——三种方案直观对比。</div>
     </div>
 
     <div class="compare-grid">
@@ -1492,7 +1492,7 @@
           <div>可迁移性<b>极差</b></div>
         </div>
         <div class="body">
-          <b>致命问题</b>：柳工 6,800 SKU + 长尾极重 + 拆零拣选为主，ASRS 的"高密度单元化"基因完全不匹配。投资大、回收慢、搬不动，是典型的"为对标而对标"的反面案例。
+          <b>致命问题</b>：本项目 6,800 SKU + 长尾极重 + 拆零拣选为主，ASRS 的"高密度单元化"基因完全不匹配。投资大、回收慢、搬不动，是典型的"为对标而对标"的反面案例。
         </div>
       </div>
 
@@ -1506,7 +1506,7 @@
           <div>可迁移性<b>差</b></div>
         </div>
         <div class="body">
-          <b>致命问题</b>：Shuttle 驶入式适合"少品类大批量缓冲库存"，而柳工是"多品类小批量 JIT 配送"，业务模式完全相反。强行使用 → 拆零灾难、出库需重组、效率反而下降。
+          <b>致命问题</b>：Shuttle 驶入式适合"少品类大批量缓冲库存"，而该客户是"多品类小批量 JIT 配送"，业务模式完全相反。强行使用 → 拆零灾难、出库需重组、效率反而下降。
         </div>
       </div>
 
@@ -1529,7 +1529,7 @@
 </main>
 
 <footer>
-  <p><span class="gold">柳工配件库智能化升级项目</span> · 自动化布局方案 v0.1 · 2026.05</p>
+  <p><span class="gold">仓库自动化升级项目</span> · 自动化布局方案 v0.1 · 2026.05</p>
   <p style="opacity:0.6;font-size:11px;">本文件基于现场调研数据 + 业务模式分析。最终方案以详细技术评审为准。</p>
 </footer>
 

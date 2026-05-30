@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
 <meta name="theme-color" content="#1A2B4A" />
-<title>柳工配件库 · 系统/订单/流程调研</title>
+<title>配件库 · 系统/订单/流程调研</title>
 <style>
   :root {
     --navy: #1A2B4A;
@@ -598,7 +598,7 @@
     <div class="brand">
       <div class="brand-mark">柳</div>
       <div class="brand-text">
-        <div class="t1">柳工配件库 · 深度调研</div>
+        <div class="t1">配件库 · 深度调研</div>
         <div class="t2">SYSTEM · ORDER · PROCESS</div>
       </div>
     </div>
@@ -685,7 +685,7 @@
 
     <div class="card">
       <div class="card-q">单订单复杂度</div>
-      <div class="card-hint">从 5/27 松芝单看到 30 SKU、477 件。问问"那是典型还是峰值"。</div>
+      <div class="card-hint">从 某次抽样单据看到 30 SKU、477 件。问问"那是典型还是峰值"。</div>
       <div class="input-row">
         <div class="num-input">
           <div class="nlabel">SKU 数</div>
@@ -870,7 +870,7 @@
     <div class="card">
       <div class="card-q">本模块补充观察</div>
       <div class="text-input">
-        <textarea data-k="order-notes" placeholder="如：周一上午订单堆积严重，常需 2 班人手；五菱 1 号线节拍最快，订单时窗常 < 2 小时..."></textarea>
+        <textarea data-k="order-notes" placeholder="如：周一上午订单堆积严重，常需 2 班人手；客户 1 号线节拍最快，订单时窗常 < 2 小时..."></textarea>
       </div>
     </div>
   </section>
@@ -925,12 +925,12 @@
       </div>
     </div>
 
-    <!-- 2.2 五菱对接 -->
-    <div class="section-title">2.2  与五菱的系统对接</div>
+    <!-- 2.2 客户对接 -->
+    <div class="section-title">2.2  与客户的系统对接</div>
 
     <div class="card">
       <div class="card-q">对接方式（核心问题）</div>
-      <div class="card-hint">单选 — 当前与五菱 MES/ERP 主要怎么传数据？</div>
+      <div class="card-hint">单选 — 当前与客户 MES/ERP 主要怎么传数据？</div>
       <div class="pick-group cols-2">
         <button class="pick-btn" data-pick="mes-link" data-val="api">API 实时接口</button>
         <button class="pick-btn" data-pick="mes-link" data-val="edi">EDI 文件</button>
@@ -1070,7 +1070,7 @@
     <div class="card">
       <div class="card-q">系统层面的核心痛点（原话记录）</div>
       <div class="text-input">
-        <textarea data-k="sys-notes" placeholder='如："查询库存要切 3 个系统"、"打印拣货单经常卡纸"、"五菱的订单经常凌晨改"...'></textarea>
+        <textarea data-k="sys-notes" placeholder='如："查询库存要切 3 个系统"、"打印拣货单经常卡纸"、"客户的订单经常凌晨改"...'></textarea>
       </div>
     </div>
   </section>
@@ -1184,7 +1184,7 @@
         <div class="interview-title">客户对接人 / 配送主管</div>
       </div>
       <textarea data-k="iv-customer" placeholder="对外协调视角的痛点、客户反馈、特殊场景..."></textarea>
-      <div class="quote-tips">💡 推荐问题：五菱最在意什么？哪类订单最难做？特殊处理有哪些？</div>
+      <div class="quote-tips">💡 推荐问题：客户最在意什么？哪类订单最难做？特殊处理有哪些？</div>
     </div>
 
     <div class="interview-card">
@@ -1194,7 +1194,7 @@
       </div>
       <textarea data-k="iv-quotes" placeholder='记录受访人最有冲击力的原话，例如：
 "现在拿对一个件号要看 3 张单子"
-"五菱凌晨改单是家常便饭"
+"客户凌晨改单是家常便饭"
 "我们最怕的是货发了但系统没记"...'></textarea>
       <div class="quote-tips">💡 这部分对汇报材料价值最高 — 客户原话比图表更有说服力</div>
     </div>
@@ -1556,7 +1556,7 @@ function buildMarkdown() {
   };
 
   let md = '';
-  md += '# 柳工配件库 · 系统/订单/流程 深度调研报告\n\n';
+  md += '# 配件库 · 系统/订单/流程 深度调研报告\n\n';
   md += `> 调研日期：${m.date || '—'}  ·  调研人员：${m.surveyor || '—'}  ·  受访人：${m.contact || '—'}  ·  时长：${m.duration || '—'}\n\n`;
   md += '---\n\n';
 
@@ -1621,7 +1621,7 @@ function buildMarkdown() {
   md += `- **WMS 功能覆盖**：${multi('wms-features', {'货位':'货位管理','批次':'批次管理','CID':'CID 容器','工位':'工位级配送','RFID':'RFID 集成','盘点':'循环盘点','预警':'安全库存预警','路径':'拣货路径优化','电子单':'无纸化作业'})}\n`;
   md += `- **其他系统**：${multi('other-sys', {'TMS':'TMS 运输','ERP':'ERP','财务':'财务','OA':'OA','GPS':'GPS 跟踪','BI':'BI 看板'})}\n\n`;
 
-  md += '### 与五菱的对接\n\n';
+  md += '### 与客户的对接\n\n';
   md += `- **对接方式**：${pick('mes-link', {'api':'API 实时接口','edi':'EDI 文件','excel':'Excel/邮件','manual':'人工录入'})}\n`;
   md += `- **同步频率**：${pick('sync-freq', {'realtime':'实时','hourly':'每小时','daily':'每日','ondemand':'按需'})}\n`;
   md += `- **共享数据**：${multi('data-shared', {'订单':'订单','库存':'库存','发货':'发货状态','批次':'批次/CID','工位':'工位信息','质量':'质量异常'})}\n\n`;
@@ -1700,9 +1700,9 @@ function buildMarkdown() {
   if (missing.length >= 3) {
     md += '- 🖥 **WMS 缺少 ' + missing.length + ' 项关键功能**（' + missing.join('、') + '）：现 WMS 需升级或替换\n';
   }
-  // 4. 五菱对接
+  // 4. 客户对接
   if (p['mes-link'] === 'manual' || p['mes-link'] === 'excel') {
-    md += '- ⚠️ **与五菱对接靠人工/Excel**：必须建立 MES 直连接口，否则自动化效果打折\n';
+    md += '- ⚠️ **与客户对接靠人工/Excel**：必须建立 MES 直连接口，否则自动化效果打折\n';
   }
   // 5. 痛点评分
   const painItems = [];
