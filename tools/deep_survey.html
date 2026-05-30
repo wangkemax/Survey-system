@@ -705,6 +705,8 @@
       </div>
     </div>
 
+    <div id="caliber-warn" style="display:none;margin:0 0 14px;padding:10px 14px;border-radius:10px;background:#FDECEA;border:1px solid #E5A79F;color:#9A2B1E;font-size:13px;line-height:1.65;"></div>
+
     <div class="card">
       <div class="card-q">订单类型分布</div>
       <div class="card-hint">滑动调整比例。三个加起来 ≈ 100%。</div>
@@ -1388,8 +1390,35 @@ function bindInputs() {
     el.addEventListener('input', () => {
       state.values[k] = el.value;
       saveState();
+      validateOrders();
     });
   });
+  validateOrders();
+}
+
+// ===== 订单口径校验（防止 单/行/件 混淆，落实经验 2/3）=====
+function validateOrders(){
+  const el = document.getElementById('caliber-warn');
+  if(!el) return;
+  const num = k => { const v = parseFloat(state.values[k]); return isNaN(v) ? null : v; };
+  const peak=num('o-peak'), avg=num('o-avg'), low=num('o-low');
+  const lpo=num('o-skuperorder'), ipo=num('o-itemperorder'), pr=num('peak-ratio');
+  const msgs=[];
+  if(lpo!=null && lpo<1) msgs.push('「行/单」< 1 不合理：每单至少 1 行。是否把单/行/件填错位了？');
+  if(ipo!=null && ipo<1) msgs.push('「件/单」< 1 不合理：每单至少 1 件。');
+  if(lpo!=null && ipo!=null && ipo<lpo) msgs.push('「件/单」('+ipo+') 小于「行/单」('+lpo+')：件数应 ≥ 行数（每行至少 1 件），请确认口径。');
+  if(peak!=null && avg!=null && peak<avg) msgs.push('峰值('+peak+') < 平均('+avg+')：峰值日订单不应小于平均。');
+  if(avg!=null && low!=null && low>avg) msgs.push('低谷('+low+') > 平均('+avg+')：低谷日订单不应大于平均。');
+  if(pr!=null && peak!=null && avg!=null && avg>0){
+    const calc=peak/avg;
+    if(Math.abs(calc-pr)/Math.max(pr,0.01) > 0.25) msgs.push('「峰值比」('+pr+') 与 峰值÷平均('+calc.toFixed(1)+') 偏差较大，请核对。');
+  }
+  if(msgs.length){
+    el.style.display='block';
+    el.innerHTML = '⚠ <b>订单口径校验</b>（经验 2：报数必问 单 / 行 / 件）<br>· ' + msgs.join('<br>· ');
+  } else {
+    el.style.display='none'; el.innerHTML='';
+  }
 }
 
 // 单选按钮
