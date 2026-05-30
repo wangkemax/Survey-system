@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#1A2B4A" />
+<title>柳工配件库 · 系统/订单/流程调研</title>
+<style>
+  :root {
+    --navy: #1A2B4A;
+    --navy-2: #2C4870;
+    --gold: #E89B3D;
+    --gold-l: #F5D89C;
+    --gold-dk: #B57920;
+    --cream: #FBF5E9;
+    --bg: #F5F7FA;
+    --white: #FFFFFF;
+    --border: #E2E8F0;
+    --border-dk: #CBD5E1;
+    --text-dk: #1A2B4A;
+    --text-mid: #475569;
+    --text-lt: #94A3B8;
+    --red: #C13C2E;
+    --green: #10B981;
+    --amber: #F59E0B;
+    --shadow-sm: 0 1px 2px rgba(15,30,55,0.06);
+    --shadow: 0 4px 14px rgba(15,30,55,0.08);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text-dk);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: contain;
+  }
+  body {
+    min-height: 100vh;
+    padding-bottom: 96px;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+
+  /* ===== 顶部 ===== */
+  .topbar {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--navy);
+    color: var(--white);
+    padding: 12px 16px 0;
+    padding-top: calc(12px + env(safe-area-inset-top));
+    box-shadow: var(--shadow);
+  }
+  .topbar-row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .brand-mark {
+    width: 32px; height: 32px;
+    border-radius: 6px;
+    background: var(--gold);
+    color: var(--navy);
+    font-weight: 800;
+    display: grid; place-items: center;
+    font-size: 17px;
+  }
+  .brand-text { line-height: 1.2; min-width: 0; }
+  .brand-text .t1 { font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .brand-text .t2 { font-size: 10px; color: var(--gold-l); letter-spacing: 1px; margin-top: 2px; text-transform: uppercase; }
+  .save-status {
+    font-size: 10px;
+    color: var(--gold-l);
+    letter-spacing: 0.5px;
+    padding: 4px 8px;
+    border: 1px solid rgba(245,216,156,0.25);
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .meta {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 10px;
+    padding-bottom: 12px;
+  }
+  .meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .meta-item label {
+    font-size: 9px; color: var(--gold-l);
+    letter-spacing: 1px; text-transform: uppercase; font-weight: 600;
+  }
+  .meta-item input {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #fff;
+    border-radius: 6px;
+    padding: 7px 10px;
+    font-size: 13px;
+    font-family: inherit;
+    width: 100%;
+  }
+  .meta-item input::placeholder { color: rgba(255,255,255,0.4); }
+  .meta-item input:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: rgba(255,255,255,0.12);
+  }
+
+  /* ===== Tab ===== */
+  .tabs {
+    display: flex;
+    background: var(--navy);
+    padding: 0 8px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .tab {
+    flex: 1;
+    background: transparent;
+    color: rgba(255,255,255,0.55);
+    border: none;
+    padding: 12px 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    position: relative;
+    text-align: center;
+  }
+  .tab .tab-n {
+    display: block;
+    font-size: 9px;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 2px;
+    letter-spacing: 1px;
+  }
+  .tab.active { color: var(--gold); }
+  .tab.active .tab-n { color: var(--gold-l); }
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 36px; height: 3px;
+    background: var(--gold);
+    border-radius: 2px 2px 0 0;
+  }
+
+  main { padding: 16px 14px 24px; }
+  .panel { display: none; animation: fadein 0.25s ease-out; }
+  .panel.active { display: block; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .section-intro {
+    background: linear-gradient(135deg, var(--cream) 0%, #fff 100%);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--gold);
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--text-mid);
+    line-height: 1.6;
+  }
+  .section-intro b { color: var(--navy); }
+
+  .section-title {
+    display: flex; align-items: center; gap: 8px;
+    margin: 24px 0 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .section-title::before {
+    content: '';
+    width: 3px; height: 14px;
+    background: var(--gold);
+    border-radius: 2px;
+  }
+  .section-title:first-child { margin-top: 0; }
+
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow-sm);
+  }
+  .card-q {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+  .card-hint {
+    font-size: 11.5px;
+    color: var(--text-mid);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  /* ===== 输入元素 ===== */
+  .input-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-top: 8px; }
+  .input-row.col-2 { grid-template-columns: 1fr 1fr; }
+  .num-input {
+    position: relative;
+  }
+  .num-input input {
+    width: 100%;
+    padding: 10px 11px 10px 11px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-size: 15px;
+    font-family: inherit;
+    background: #FAFBFC;
+    font-weight: 600;
+    color: var(--navy);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+  .num-input input:focus { outline: none; border-color: var(--gold); background: #fff; }
+  .num-input .nlabel {
+    font-size: 9px;
+    color: var(--text-lt);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .num-input .unit {
+    font-size: 10px;
+    color: var(--text-lt);
+    text-align: center;
+    margin-top: 3px;
+    font-weight: 500;
+  }
+
+  .text-input input,
+  .text-input textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #FAFBFC;
+    color: var(--text-dk);
+  }
+  .text-input textarea { resize: vertical; min-height: 64px; }
+  .text-input input:focus,
+  .text-input textarea:focus { outline: none; border-color: var(--gold); background: #fff; }
+
+  /* 选择按钮组 */
+  .pick-group {
+    display: grid;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .pick-group.cols-2 { grid-template-columns: 1fr 1fr; }
+  .pick-group.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .pick-group.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .pick-btn {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: 7px;
+    padding: 9px 6px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-mid);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.12s;
+    text-align: center;
+    line-height: 1.3;
+  }
+  .pick-btn:active { transform: scale(0.96); }
+  .pick-btn.selected {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: var(--gold);
+  }
+
+  /* 滑动百分比 */
+  .pct-group { margin-top: 10px; }
+  .pct-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 50px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .pct-row label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dk);
+  }
+  .pct-row input[type=range] {
+    width: 100%;
+    height: 6px;
+    -webkit-appearance: none;
+    background: var(--border);
+    border-radius: 3px;
+    outline: none;
+  }
+  .pct-row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 22px; height: 22px;
+    background: var(--gold);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  }
+  .pct-val {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gold-dk);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .pct-total {
+    text-align: right;
+    font-size: 11px;
+    color: var(--text-lt);
+    margin-top: 4px;
+  }
+  .pct-total.warn { color: var(--red); font-weight: 700; }
+
+  /* 严重程度评分 */
+  .severity {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .sev-btn {
+    aspect-ratio: 1.6 / 1;
+    border: 1.5px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-lt);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.12s;
+  }
+  .sev-btn:active { transform: scale(0.92); }
+  .sev-btn[data-val="1"].selected { background: #ECFDF5; border-color: var(--green); color: var(--green); }
+  .sev-btn[data-val="2"].selected { background: #ECFDF5; border-color: var(--green); color: var(--green); }
+  .sev-btn[data-val="3"].selected { background: #FEF3C7; border-color: var(--amber); color: var(--gold-dk); }
+  .sev-btn[data-val="4"].selected { background: #FEE2E0; border-color: var(--red); color: var(--red); }
+  .sev-btn[data-val="5"].selected { background: var(--red); border-color: var(--red); color: #fff; }
+  .sev-ticks {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .sev-ticks span {
+    font-size: 9px;
+    color: var(--text-lt);
+    text-align: center;
+  }
+
+  /* 访谈速记区 */
+  .interview-card {
+    background: linear-gradient(135deg, #fff 0%, var(--cream) 100%);
+    border: 1px solid var(--gold-l);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+  .interview-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .interview-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .interview-icon {
+    width: 32px; height: 32px;
+    background: var(--gold);
+    color: var(--navy);
+    border-radius: 50%;
+    display: grid; place-items: center;
+    font-size: 16px;
+    font-weight: 800;
+  }
+  .interview-card textarea {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 12px;
+    font-size: 13.5px;
+    font-family: inherit;
+    background: #fff;
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.6;
+  }
+  .interview-card textarea:focus { outline: none; border-color: var(--gold); }
+  .quote-tips {
+    font-size: 11px;
+    color: var(--text-lt);
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  /* 底部 */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.98);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border);
+    padding: 12px 14px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    z-index: 40;
+    display: flex;
+    gap: 8px;
+  }
+  .export-btn {
+    flex: 1;
+    padding: 12px;
+    background: var(--gold);
+    color: var(--navy);
+    border: none;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 4px 12px rgba(232,155,61,0.35);
+  }
+  .reset-btn {
+    padding: 12px 16px;
+    background: #fff;
+    color: var(--text-mid);
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,25,45,0.75);
+    z-index: 100;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .modal-backdrop.show { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 88vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .modal-head {
+    background: var(--navy);
+    color: #fff;
+    padding: 14px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .modal-head h3 { margin: 0; font-size: 15px; }
+  .modal-head .sub {
+    font-size: 11px;
+    color: var(--gold-l);
+    margin-left: 8px;
+  }
+  .modal-close {
+    background: none; border: none; color: #fff;
+    font-size: 22px; cursor: pointer; padding: 0 4px;
+  }
+  .modal-body {
+    padding: 14px 16px;
+    overflow-y: auto;
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+  }
+  .modal-body pre {
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 11px;
+    font-family: "SF Mono", "Menlo", monospace;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--text-dk);
+    margin: 0;
+  }
+  .modal-foot {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .modal-btn {
+    padding: 11px;
+    border-radius: 8px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+  }
+  .modal-btn.primary { background: var(--gold); color: var(--navy); }
+  .modal-btn.secondary { background: var(--cream); color: var(--navy); border: 1px solid var(--border); }
+  .modal-btn.danger { background: var(--red); color: #fff; }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 110px; left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--navy);
+    color: var(--gold);
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.25s;
+    z-index: 200;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* 数据导入区 */
+  .data-pull-card {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+    color: #fff;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .data-pull-card h3 {
+    margin: 0 0 6px;
+    font-size: 14px;
+    color: var(--gold);
+  }
+  .data-pull-card p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.85);
+    margin: 0 0 10px;
+    line-height: 1.55;
+  }
+  .data-check {
+    display: grid;
+    gap: 5px;
+  }
+  .data-check label {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-size: 12.5px;
+    color: rgba(255,255,255,0.9);
+    cursor: pointer;
+    padding: 6px 8px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 6px;
+  }
+  .data-check label.got { background: rgba(16,185,129,0.2); }
+  .data-check input[type=checkbox] {
+    margin-top: 2px;
+    accent-color: var(--gold);
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- 顶部 -->
+<header class="topbar">
+  <div class="topbar-row">
+    <div class="brand">
+      <div class="brand-mark">柳</div>
+      <div class="brand-text">
+        <div class="t1">柳工配件库 · 深度调研</div>
+        <div class="t2">SYSTEM · ORDER · PROCESS</div>
+      </div>
+    </div>
+    <div class="save-status" id="saveStatus">已保存</div>
+  </div>
+
+  <div class="meta">
+    <div class="meta-item">
+      <label>调研日期</label>
+      <input type="date" id="meta-date" />
+    </div>
+    <div class="meta-item">
+      <label>调研人员</label>
+      <input type="text" id="meta-surveyor" placeholder="姓名 / 组" />
+    </div>
+    <div class="meta-item">
+      <label>主要受访人</label>
+      <input type="text" id="meta-contact" placeholder="姓名 + 职位" />
+    </div>
+    <div class="meta-item">
+      <label>访谈时长</label>
+      <input type="text" id="meta-duration" placeholder="如 2 小时" />
+    </div>
+  </div>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="order">
+      <span class="tab-n">PART 1</span>
+      订单 · 流程
+    </button>
+    <button class="tab" data-tab="system">
+      <span class="tab-n">PART 2</span>
+      系统现状
+    </button>
+    <button class="tab" data-tab="pain">
+      <span class="tab-n">PART 3</span>
+      异常 · 访谈
+    </button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- ============ Panel 1: 订单 + 流程 ============ -->
+  <section class="panel active" id="panel-order">
+    <div class="section-intro">
+      <b>关键数据</b> — 决定 AGV/AMR 数量、立体仓规模、ROI 测算的基线。<br>
+      所有数字尽量从客户的 WMS / ERP 系统拉，不要凭印象。
+    </div>
+
+    <!-- 数据拉取检查清单 -->
+    <div class="data-pull-card">
+      <h3>🎯 关键数据拉取清单</h3>
+      <p>能从客户系统导出 Excel 是最理想的。下面是优先级排序：</p>
+      <div class="data-check" id="data-checklist">
+        <!-- 动态生成 -->
+      </div>
+    </div>
+
+    <!-- 1.1 订单量 -->
+    <div class="section-title">1.1  订单量基线</div>
+
+    <div class="card">
+      <div class="card-q">日均订单数</div>
+      <div class="card-hint">填工作日典型值。多客户分别填更好。</div>
+      <div class="input-row">
+        <div class="num-input">
+          <div class="nlabel">峰值</div>
+          <input type="number" inputmode="numeric" data-k="o-peak" placeholder="-" />
+          <div class="unit">单/日</div>
+        </div>
+        <div class="num-input">
+          <div class="nlabel">平均</div>
+          <input type="number" inputmode="numeric" data-k="o-avg" placeholder="-" />
+          <div class="unit">单/日</div>
+        </div>
+        <div class="num-input">
+          <div class="nlabel">低谷</div>
+          <input type="number" inputmode="numeric" data-k="o-low" placeholder="-" />
+          <div class="unit">单/日</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">单订单复杂度</div>
+      <div class="card-hint">从 5/27 松芝单看到 30 SKU、477 件。问问"那是典型还是峰值"。</div>
+      <div class="input-row">
+        <div class="num-input">
+          <div class="nlabel">SKU 数</div>
+          <input type="number" inputmode="numeric" data-k="o-skuperorder" placeholder="-" />
+          <div class="unit">行/单</div>
+        </div>
+        <div class="num-input">
+          <div class="nlabel">件数</div>
+          <input type="number" inputmode="numeric" data-k="o-itemperorder" placeholder="-" />
+          <div class="unit">件/单</div>
+        </div>
+        <div class="num-input">
+          <div class="nlabel">最大单</div>
+          <input type="number" inputmode="numeric" data-k="o-maxorder" placeholder="-" />
+          <div class="unit">SKU</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">订单类型分布</div>
+      <div class="card-hint">滑动调整比例。三个加起来 ≈ 100%。</div>
+      <div class="pct-group">
+        <div class="pct-row">
+          <label>JIT 紧急</label>
+          <input type="range" min="0" max="100" data-pct="jit" value="50" />
+          <span class="pct-val" id="pct-jit">50%</span>
+        </div>
+        <div class="pct-row">
+          <label>普通配送</label>
+          <input type="range" min="0" max="100" data-pct="normal" value="35" />
+          <span class="pct-val" id="pct-normal">35%</span>
+        </div>
+        <div class="pct-row">
+          <label>售后散单</label>
+          <input type="range" min="0" max="100" data-pct="aftersales" value="15" />
+          <span class="pct-val" id="pct-aftersales">15%</span>
+        </div>
+        <div class="pct-total" id="pct-total">总和：100%</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">订单时窗</div>
+      <div class="card-hint">客户下单到要求送达的间隔时间</div>
+      <div class="pick-group cols-4">
+        <button class="pick-btn" data-pick="window" data-val="1h">≤ 1 小时</button>
+        <button class="pick-btn" data-pick="window" data-val="4h">≤ 4 小时</button>
+        <button class="pick-btn" data-pick="window" data-val="1d">当日</button>
+        <button class="pick-btn" data-pick="window" data-val="1d+">次日+</button>
+      </div>
+      <div class="text-input" style="margin-top:10px;">
+        <textarea data-k="window-detail" placeholder="补充说明：不同客户/不同订单类型时窗差异..."></textarea>
+      </div>
+    </div>
+
+    <!-- 1.2 流程时间 -->
+    <div class="section-title">1.2  关键流程时间</div>
+
+    <div class="card">
+      <div class="card-q">单订单端到端时长</div>
+      <div class="card-hint">下单 → 拣货 → 复核 → 包装 → 出库 全程</div>
+      <div class="input-row col-2">
+        <div class="num-input">
+          <div class="nlabel">平均</div>
+          <input type="number" inputmode="numeric" data-k="lead-avg" placeholder="-" />
+          <div class="unit">分钟</div>
+        </div>
+        <div class="num-input">
+          <div class="nlabel">最长</div>
+          <input type="number" inputmode="numeric" data-k="lead-max" placeholder="-" />
+          <div class="unit">分钟</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">各环节耗时占比</div>
+      <div class="card-hint">大致估算，加起来 ≈ 100%</div>
+      <div class="pct-group">
+        <div class="pct-row">
+          <label>拣货走动</label>
+          <input type="range" min="0" max="100" data-pct="t-pick" value="40" />
+          <span class="pct-val" id="pct-t-pick">40%</span>
+        </div>
+        <div class="pct-row">
+          <label>翻箱取件</label>
+          <input type="range" min="0" max="100" data-pct="t-grab" value="20" />
+          <span class="pct-val" id="pct-t-grab">20%</span>
+        </div>
+        <div class="pct-row">
+          <label>复核 / 核对</label>
+          <input type="range" min="0" max="100" data-pct="t-check" value="15" />
+          <span class="pct-val" id="pct-t-check">15%</span>
+        </div>
+        <div class="pct-row">
+          <label>包装</label>
+          <input type="range" min="0" max="100" data-pct="t-pack" value="15" />
+          <span class="pct-val" id="pct-t-pack">15%</span>
+        </div>
+        <div class="pct-row">
+          <label>装车 / 其他</label>
+          <input type="range" min="0" max="100" data-pct="t-load" value="10" />
+          <span class="pct-val" id="pct-t-load">10%</span>
+        </div>
+        <div class="pct-total" id="pct-total-t">总和：100%</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">人均效率</div>
+      <div class="input-row col-2">
+        <div class="num-input">
+          <div class="nlabel">拣货员</div>
+          <input type="number" inputmode="numeric" data-k="eff-picker" placeholder="-" />
+          <div class="unit">单/日·人</div>
+        </div>
+        <div class="num-input">
+          <div class="nlabel">复核员</div>
+          <input type="number" inputmode="numeric" data-k="eff-checker" placeholder="-" />
+          <div class="unit">单/日·人</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">质量指标</div>
+      <div class="input-row">
+        <div class="num-input">
+          <div class="nlabel">错拣率</div>
+          <input type="number" inputmode="decimal" step="0.01" data-k="qa-misspick" placeholder="-" />
+          <div class="unit">%</div>
+        </div>
+        <div class="num-input">
+          <div class="nlabel">准时率</div>
+          <input type="number" inputmode="decimal" step="0.01" data-k="qa-ontime" placeholder="-" />
+          <div class="unit">%</div>
+        </div>
+        <div class="num-input">
+          <div class="nlabel">客诉率</div>
+          <input type="number" inputmode="decimal" step="0.01" data-k="qa-claim" placeholder="-" />
+          <div class="unit">%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1.3 波动性 -->
+    <div class="section-title">1.3  波动性</div>
+
+    <div class="card">
+      <div class="card-q">订单波峰发生时段</div>
+      <div class="card-hint">多选 — 哪些时间最忙？</div>
+      <div class="pick-group cols-3" data-multi="peak-time">
+        <button class="pick-btn" data-val="morning">每日早班</button>
+        <button class="pick-btn" data-val="evening">每日晚班</button>
+        <button class="pick-btn" data-val="monday">周一</button>
+        <button class="pick-btn" data-val="friday">周五</button>
+        <button class="pick-btn" data-val="month-end">月末</button>
+        <button class="pick-btn" data-val="month-start">月初</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">峰谷倍数</div>
+      <div class="card-hint">峰值订单量 ÷ 平均订单量</div>
+      <div class="input-row col-2">
+        <div class="num-input">
+          <div class="nlabel">倍数</div>
+          <input type="number" inputmode="decimal" step="0.1" data-k="peak-ratio" placeholder="-" />
+          <div class="unit">倍</div>
+        </div>
+        <div class="num-input">
+          <div class="nlabel">急单占比</div>
+          <input type="number" inputmode="numeric" data-k="rush-ratio" placeholder="-" />
+          <div class="unit">%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">本模块补充观察</div>
+      <div class="text-input">
+        <textarea data-k="order-notes" placeholder="如：周一上午订单堆积严重，常需 2 班人手；五菱 1 号线节拍最快，订单时窗常 < 2 小时..."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Panel 2: 系统现状 ============ -->
+  <section class="panel" id="panel-system">
+    <div class="section-intro">
+      <b>系统现状</b> — 决定 WMS / TMS / 数据中台的建设范围（软件层 ≈ 300 万投资分配）。
+    </div>
+
+    <!-- 2.1 系统盘点 -->
+    <div class="section-title">2.1  现有系统</div>
+
+    <div class="card">
+      <div class="card-q">WMS 仓储管理系统</div>
+      <div class="card-hint">现在用什么管仓库？</div>
+      <div class="pick-group cols-3">
+        <button class="pick-btn" data-pick="wms-type" data-val="自研">自研系统</button>
+        <button class="pick-btn" data-pick="wms-type" data-val="商用">商用品牌</button>
+        <button class="pick-btn" data-pick="wms-type" data-val="excel">Excel/纸质</button>
+      </div>
+      <div class="text-input" style="margin-top:8px;">
+        <input type="text" data-k="wms-name" placeholder="系统名称、供应商、版本..." />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">WMS 功能覆盖</div>
+      <div class="card-hint">多选 — 现有系统支持哪些功能？</div>
+      <div class="pick-group cols-3" data-multi="wms-features">
+        <button class="pick-btn" data-val="货位">货位管理</button>
+        <button class="pick-btn" data-val="批次">批次管理</button>
+        <button class="pick-btn" data-val="CID">CID 容器</button>
+        <button class="pick-btn" data-val="工位">工位级配送</button>
+        <button class="pick-btn" data-val="RFID">RFID 集成</button>
+        <button class="pick-btn" data-val="盘点">循环盘点</button>
+        <button class="pick-btn" data-val="预警">安全库存预警</button>
+        <button class="pick-btn" data-val="路径">拣货路径优化</button>
+        <button class="pick-btn" data-val="电子单">无纸化作业</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">其他系统</div>
+      <div class="pick-group cols-2" data-multi="other-sys">
+        <button class="pick-btn" data-val="TMS">TMS 运输</button>
+        <button class="pick-btn" data-val="ERP">ERP</button>
+        <button class="pick-btn" data-val="财务">财务</button>
+        <button class="pick-btn" data-val="OA">OA</button>
+        <button class="pick-btn" data-val="GPS">GPS 跟踪</button>
+        <button class="pick-btn" data-val="BI">BI 看板</button>
+      </div>
+    </div>
+
+    <!-- 2.2 五菱对接 -->
+    <div class="section-title">2.2  与五菱的系统对接</div>
+
+    <div class="card">
+      <div class="card-q">对接方式（核心问题）</div>
+      <div class="card-hint">单选 — 当前与五菱 MES/ERP 主要怎么传数据？</div>
+      <div class="pick-group cols-2">
+        <button class="pick-btn" data-pick="mes-link" data-val="api">API 实时接口</button>
+        <button class="pick-btn" data-pick="mes-link" data-val="edi">EDI 文件</button>
+        <button class="pick-btn" data-pick="mes-link" data-val="excel">Excel/邮件</button>
+        <button class="pick-btn" data-pick="mes-link" data-val="manual">人工录入</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">数据同步频率</div>
+      <div class="pick-group cols-4">
+        <button class="pick-btn" data-pick="sync-freq" data-val="realtime">实时</button>
+        <button class="pick-btn" data-pick="sync-freq" data-val="hourly">每小时</button>
+        <button class="pick-btn" data-pick="sync-freq" data-val="daily">每日</button>
+        <button class="pick-btn" data-pick="sync-freq" data-val="ondemand">按需</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">对接的数据类型</div>
+      <div class="pick-group cols-3" data-multi="data-shared">
+        <button class="pick-btn" data-val="订单">订单</button>
+        <button class="pick-btn" data-val="库存">库存</button>
+        <button class="pick-btn" data-val="发货">发货状态</button>
+        <button class="pick-btn" data-val="批次">批次/CID</button>
+        <button class="pick-btn" data-val="工位">工位信息</button>
+        <button class="pick-btn" data-val="质量">质量异常</button>
+      </div>
+    </div>
+
+    <!-- 2.3 数据质量 -->
+    <div class="section-title">2.3  数据质量</div>
+
+    <div class="card">
+      <div class="card-q">SKU 编码统一性</div>
+      <div class="pick-group cols-3">
+        <button class="pick-btn" data-pick="sku-std" data-val="all">各系统统一</button>
+        <button class="pick-btn" data-pick="sku-std" data-val="partial">部分一致</button>
+        <button class="pick-btn" data-pick="sku-std" data-val="no">不一致</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">账实差异率</div>
+      <div class="card-hint">盘点时账面与实物的差异比例</div>
+      <div class="input-row col-2">
+        <div class="num-input">
+          <div class="nlabel">数量差</div>
+          <input type="number" inputmode="decimal" step="0.01" data-k="inv-diff" placeholder="-" />
+          <div class="unit">%</div>
+        </div>
+        <div class="num-input">
+          <div class="nlabel">SKU 差</div>
+          <input type="number" inputmode="decimal" step="0.01" data-k="inv-sku-diff" placeholder="-" />
+          <div class="unit">%</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">货位编码颗粒度</div>
+      <div class="pick-group cols-4">
+        <button class="pick-btn" data-pick="loc-grain" data-val="zone">仅大区位</button>
+        <button class="pick-btn" data-pick="loc-grain" data-val="row">区+排</button>
+        <button class="pick-btn" data-pick="loc-grain" data-val="cell">区+排+层</button>
+        <button class="pick-btn" data-pick="loc-grain" data-val="full">区+排+列+层</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">条码 / 二维码覆盖率</div>
+      <div class="input-row col-2">
+        <div class="num-input">
+          <div class="nlabel">SKU 贴码</div>
+          <input type="number" inputmode="numeric" data-k="barcode-sku" placeholder="-" />
+          <div class="unit">%</div>
+        </div>
+        <div class="num-input">
+          <div class="nlabel">货位贴码</div>
+          <input type="number" inputmode="numeric" data-k="barcode-loc" placeholder="-" />
+          <div class="unit">%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2.4 系统痛点评分 -->
+    <div class="section-title">2.4  系统痛点评分</div>
+
+    <div class="card">
+      <div class="card-q">查询库存是否方便？</div>
+      <div class="card-hint">5 分制：1=非常顺畅 / 3=一般 / 5=非常痛苦</div>
+      <div class="severity" data-sev="sys-query">
+        <button class="sev-btn" data-val="1">1</button>
+        <button class="sev-btn" data-val="2">2</button>
+        <button class="sev-btn" data-val="3">3</button>
+        <button class="sev-btn" data-val="4">4</button>
+        <button class="sev-btn" data-val="5">5</button>
+      </div>
+      <div class="sev-ticks">
+        <span>很顺畅</span><span></span><span>一般</span><span></span><span>很痛苦</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">生成拣货单是否高效？</div>
+      <div class="severity" data-sev="sys-pickorder">
+        <button class="sev-btn" data-val="1">1</button>
+        <button class="sev-btn" data-val="2">2</button>
+        <button class="sev-btn" data-val="3">3</button>
+        <button class="sev-btn" data-val="4">4</button>
+        <button class="sev-btn" data-val="5">5</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">盘点是否痛苦？</div>
+      <div class="severity" data-sev="sys-stock">
+        <button class="sev-btn" data-val="1">1</button>
+        <button class="sev-btn" data-val="2">2</button>
+        <button class="sev-btn" data-val="3">3</button>
+        <button class="sev-btn" data-val="4">4</button>
+        <button class="sev-btn" data-val="5">5</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">异常订单处理是否复杂？</div>
+      <div class="severity" data-sev="sys-exception">
+        <button class="sev-btn" data-val="1">1</button>
+        <button class="sev-btn" data-val="2">2</button>
+        <button class="sev-btn" data-val="3">3</button>
+        <button class="sev-btn" data-val="4">4</button>
+        <button class="sev-btn" data-val="5">5</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">系统层面的核心痛点（原话记录）</div>
+      <div class="text-input">
+        <textarea data-k="sys-notes" placeholder='如："查询库存要切 3 个系统"、"打印拣货单经常卡纸"、"五菱的订单经常凌晨改"...'></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Panel 3: 异常 + 访谈 ============ -->
+  <section class="panel" id="panel-pain">
+    <div class="section-intro">
+      <b>异常场景 + 访谈速记</b> — 自动化方案能不能扛住，看的就是异常时候表现。
+    </div>
+
+    <!-- 3.1 异常场景 -->
+    <div class="section-title">3.1  异常处理</div>
+
+    <div class="card">
+      <div class="card-q">特殊订单处理方式</div>
+      <div class="card-hint">超规格、超重、定制件等</div>
+      <div class="text-input">
+        <textarea data-k="ex-special" placeholder="目前怎么处理这类订单？由谁负责？流程是？"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">缺货预警与补救</div>
+      <div class="text-input">
+        <textarea data-k="ex-shortage" placeholder="发现缺货后怎么办？应急流程是什么？多久能解决？"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">退货 / 换件流程</div>
+      <div class="input-row col-2">
+        <div class="num-input">
+          <div class="nlabel">退货率</div>
+          <input type="number" inputmode="decimal" step="0.01" data-k="ex-return" placeholder="-" />
+          <div class="unit">%</div>
+        </div>
+        <div class="num-input">
+          <div class="nlabel">月退货次数</div>
+          <input type="number" inputmode="numeric" data-k="ex-return-cnt" placeholder="-" />
+          <div class="unit">次/月</div>
+        </div>
+      </div>
+      <div class="text-input" style="margin-top:8px;">
+        <textarea data-k="ex-return-note" placeholder="退货流程概述：发起 → 收回 → 入库 → 财务对账..."></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">盘点</div>
+      <div class="pick-group cols-3">
+        <button class="pick-btn" data-pick="stock-freq" data-val="day">每日</button>
+        <button class="pick-btn" data-pick="stock-freq" data-val="week">每周</button>
+        <button class="pick-btn" data-pick="stock-freq" data-val="month">每月</button>
+        <button class="pick-btn" data-pick="stock-freq" data-val="quarter">每季</button>
+      </div>
+      <div class="input-row col-2" style="margin-top:8px;">
+        <div class="num-input">
+          <div class="nlabel">单次耗时</div>
+          <input type="number" inputmode="numeric" data-k="stock-hours" placeholder="-" />
+          <div class="unit">小时</div>
+        </div>
+        <div class="num-input">
+          <div class="nlabel">参与人数</div>
+          <input type="number" inputmode="numeric" data-k="stock-people" placeholder="-" />
+          <div class="unit">人</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">客诉典型场景</div>
+      <div class="card-hint">客户最常投诉什么？</div>
+      <div class="pick-group cols-2" data-multi="claims">
+        <button class="pick-btn" data-val="late">送达延迟</button>
+        <button class="pick-btn" data-val="wrong">送错件</button>
+        <button class="pick-btn" data-val="short">缺件少数</button>
+        <button class="pick-btn" data-val="damage">货损</button>
+        <button class="pick-btn" data-val="quality">质量问题</button>
+        <button class="pick-btn" data-val="info">信息错误</button>
+      </div>
+      <div class="text-input" style="margin-top:8px;">
+        <textarea data-k="claim-detail" placeholder="举 2-3 个最近的实际案例..."></textarea>
+      </div>
+    </div>
+
+    <!-- 3.2 访谈速记 -->
+    <div class="section-title">3.2  访谈速记</div>
+
+    <div class="interview-card">
+      <div class="interview-head">
+        <div class="interview-icon">主</div>
+        <div class="interview-title">仓库主任 / IT 负责人</div>
+      </div>
+      <textarea data-k="iv-manager" placeholder="管理视角的痛点、规划诉求、对自动化的态度..."></textarea>
+      <div class="quote-tips">💡 推荐问题：当前业务最大瓶颈？下一年规划？担心自动化影响什么？</div>
+    </div>
+
+    <div class="interview-card">
+      <div class="interview-head">
+        <div class="interview-icon">仓</div>
+        <div class="interview-title">资深拣货员 / 仓管员</div>
+      </div>
+      <textarea data-k="iv-worker" placeholder="一线视角的操作痛点、隐性规则、变通办法...
+（这是最有价值的访谈，他们知道系统在哪里失灵）"></textarea>
+      <div class="quote-tips">💡 推荐问题：今天最累的活是什么？系统哪儿不好用？凭脑子记的规则有什么？</div>
+    </div>
+
+    <div class="interview-card">
+      <div class="interview-head">
+        <div class="interview-icon">客</div>
+        <div class="interview-title">客户对接人 / 配送主管</div>
+      </div>
+      <textarea data-k="iv-customer" placeholder="对外协调视角的痛点、客户反馈、特殊场景..."></textarea>
+      <div class="quote-tips">💡 推荐问题：五菱最在意什么？哪类订单最难做？特殊处理有哪些？</div>
+    </div>
+
+    <div class="interview-card">
+      <div class="interview-head">
+        <div class="interview-icon">★</div>
+        <div class="interview-title">"金句"收集</div>
+      </div>
+      <textarea data-k="iv-quotes" placeholder='记录受访人最有冲击力的原话，例如：
+"现在拿对一个件号要看 3 张单子"
+"五菱凌晨改单是家常便饭"
+"我们最怕的是货发了但系统没记"...'></textarea>
+      <div class="quote-tips">💡 这部分对汇报材料价值最高 — 客户原话比图表更有说服力</div>
+    </div>
+
+    <!-- 3.3 自动化态度 -->
+    <div class="section-title">3.3  组织对自动化的态度</div>
+
+    <div class="card">
+      <div class="card-q">受访人对自动化的总体态度</div>
+      <div class="pick-group cols-3">
+        <button class="pick-btn" data-pick="att-overall" data-val="support">积极支持</button>
+        <button class="pick-btn" data-pick="att-overall" data-val="neutral">中立观望</button>
+        <button class="pick-btn" data-pick="att-overall" data-val="resist">担心抵触</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">主要顾虑（多选）</div>
+      <div class="pick-group cols-2" data-multi="concerns">
+        <button class="pick-btn" data-val="job">人员替代</button>
+        <button class="pick-btn" data-val="cost">投资回报</button>
+        <button class="pick-btn" data-val="stable">稳定性</button>
+        <button class="pick-btn" data-val="learn">学习成本</button>
+        <button class="pick-btn" data-val="custom">柔性差</button>
+        <button class="pick-btn" data-val="vendor">供应商绑定</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-q">未明确事项 / 下次再问</div>
+      <div class="text-input">
+        <textarea data-k="todos" placeholder="本次没问清的、需要后续跟进的问题列表..."></textarea>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="bottom-bar">
+  <button class="reset-btn" id="reset-btn">重置</button>
+  <button class="export-btn" id="export-btn">导出 Markdown 报告</button>
+</footer>
+
+<!-- Modal: 导出 -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>调研报告 <span class="sub" id="modal-sub"></span></h3>
+      <button class="modal-close" id="modal-close">×</button>
+    </div>
+    <div class="modal-body">
+      <pre id="md-output"></pre>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-btn secondary" id="copy-btn">复制</button>
+      <button class="modal-btn primary" id="download-btn">下载 .md</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: 确认重置 -->
+<div class="modal-backdrop" id="confirm-modal">
+  <div class="modal" style="max-width:340px;">
+    <div class="modal-head">
+      <h3>清空所有数据？</h3>
+      <button class="modal-close" id="confirm-close">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin:0;font-size:13.5px;line-height:1.6;">所有打分、填写内容将被清除，此操作不可撤销。</p>
+    </div>
+    <div class="modal-foot">
+      <button class="modal-btn secondary" id="confirm-cancel">取消</button>
+      <button class="modal-btn danger" id="confirm-ok">确认重置</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STORAGE_KEY = 'liugong_deep_survey_v1';
+
+// 关键数据拉取清单
+const DATA_LIST = [
+  { id:'export-skuflow', text:'近 3 个月 SKU 出库流水（Excel） · 黄金数据' },
+  { id:'export-skumaster', text:'SKU 主数据（料号、品类、重量、尺寸）' },
+  { id:'export-orders', text:'近 1 个月订单明细（订单号、客户、SKU、件数、时间）' },
+  { id:'export-inv', text:'当前库存快照（按货位）' },
+  { id:'export-locations', text:'货位编码清单' },
+  { id:'export-customers', text:'客户/产线/工位清单' },
+  { id:'export-deliveries', text:'近 1 个月配送单样本（含批次/CID）' },
+  { id:'export-claims', text:'近半年客诉记录 / 异常订单清单' },
+];
+
+let state = {
+  meta: { date:'', surveyor:'', contact:'', duration:'' },
+  values: {},      // 文本/数字输入
+  picks: {},       // 单选
+  multis: {},      // 多选
+  pcts: {},        // 百分比滑块
+  sevs: {},        // 严重程度评分
+  datapull: {},    // 数据拉取清单勾选
+};
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      state = Object.assign(state, JSON.parse(raw));
+      ['values','picks','multis','pcts','sevs','datapull'].forEach(k => {
+        if (!state[k]) state[k] = {};
+      });
+    }
+  } catch (e) {}
+}
+
+let saveTimer = null;
+function saveState(silent) {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if (!silent) {
+        const el = document.getElementById('saveStatus');
+        el.textContent = '已保存 ' + nowHHMM();
+      }
+    } catch (e) {}
+  }, 250);
+}
+
+function nowHHMM() {
+  const d = new Date();
+  return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+}
+
+// Tab 切换
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+});
+
+// 元信息
+function bindMeta() {
+  ['date','surveyor','contact','duration'].forEach(k => {
+    const el = document.getElementById('meta-' + k);
+    el.value = state.meta[k] || '';
+    el.addEventListener('input', () => {
+      state.meta[k] = el.value;
+      saveState();
+    });
+  });
+  if (!state.meta.date) {
+    const t = new Date();
+    const iso = t.getFullYear()+'-'+(t.getMonth()+1).toString().padStart(2,'0')+'-'+t.getDate().toString().padStart(2,'0');
+    document.getElementById('meta-date').value = iso;
+    state.meta.date = iso;
+    saveState(true);
+  }
+}
+
+// 数据拉取清单
+function renderDataList() {
+  const el = document.getElementById('data-checklist');
+  el.innerHTML = '';
+  DATA_LIST.forEach(d => {
+    const cb = state.datapull[d.id] || false;
+    const lbl = document.createElement('label');
+    lbl.className = cb ? 'got' : '';
+    lbl.innerHTML = `<input type="checkbox" ${cb?'checked':''} data-datapull="${d.id}"><span>${d.text}</span>`;
+    el.appendChild(lbl);
+  });
+  el.querySelectorAll('[data-datapull]').forEach(c => {
+    c.addEventListener('change', () => {
+      state.datapull[c.dataset.datapull] = c.checked;
+      saveState();
+      renderDataList();
+    });
+  });
+}
+
+// 数字 / 文本输入
+function bindInputs() {
+  document.querySelectorAll('[data-k]').forEach(el => {
+    const k = el.dataset.k;
+    if (state.values[k] !== undefined) el.value = state.values[k];
+    el.addEventListener('input', () => {
+      state.values[k] = el.value;
+      saveState();
+    });
+  });
+}
+
+// 单选按钮
+function bindPicks() {
+  const map = {};
+  document.querySelectorAll('[data-pick]').forEach(btn => {
+    const k = btn.dataset.pick;
+    if (!map[k]) map[k] = [];
+    map[k].push(btn);
+    btn.addEventListener('click', () => {
+      const cur = state.picks[k];
+      if (cur === btn.dataset.val) {
+        delete state.picks[k];
+      } else {
+        state.picks[k] = btn.dataset.val;
+      }
+      map[k].forEach(b => b.classList.toggle('selected', state.picks[k] === b.dataset.val));
+      saveState();
+    });
+  });
+  Object.keys(map).forEach(k => {
+    if (state.picks[k]) {
+      map[k].forEach(b => b.classList.toggle('selected', state.picks[k] === b.dataset.val));
+    }
+  });
+}
+
+// 多选按钮
+function bindMultis() {
+  document.querySelectorAll('[data-multi]').forEach(group => {
+    const k = group.dataset.multi;
+    if (!state.multis[k]) state.multis[k] = [];
+    group.querySelectorAll('.pick-btn').forEach(btn => {
+      if (state.multis[k].includes(btn.dataset.val)) btn.classList.add('selected');
+      btn.addEventListener('click', () => {
+        const v = btn.dataset.val;
+        const idx = state.multis[k].indexOf(v);
+        if (idx >= 0) {
+          state.multis[k].splice(idx, 1);
+          btn.classList.remove('selected');
+        } else {
+          state.multis[k].push(v);
+          btn.classList.add('selected');
+        }
+        saveState();
+      });
+    });
+  });
+}
+
+// 百分比滑块
+function bindPcts() {
+  // 找出所有 pct 分组（按相同 group 名）
+  const groups = {
+    'order-type': ['jit','normal','aftersales'],
+    'time-split': ['t-pick','t-grab','t-check','t-pack','t-load'],
+  };
+  document.querySelectorAll('[data-pct]').forEach(sl => {
+    const k = sl.dataset.pct;
+    if (state.pcts[k] !== undefined) {
+      sl.value = state.pcts[k];
+    } else {
+      // 把 HTML 默认值写入 state，确保 updateTotals 计算正确
+      state.pcts[k] = parseInt(sl.value);
+    }
+    const valEl = document.getElementById('pct-' + k);
+    if (valEl) valEl.textContent = sl.value + '%';
+    sl.addEventListener('input', () => {
+      state.pcts[k] = parseInt(sl.value);
+      if (valEl) valEl.textContent = sl.value + '%';
+      updateTotals();
+      saveState();
+    });
+  });
+  updateTotals();
+
+  function updateTotals() {
+    // 订单类型
+    const t1 = (parseInt(state.pcts.jit)||0) + (parseInt(state.pcts.normal)||0) + (parseInt(state.pcts.aftersales)||0);
+    const t1el = document.getElementById('pct-total');
+    if (t1el) {
+      t1el.textContent = '总和：' + t1 + '%';
+      t1el.classList.toggle('warn', Math.abs(t1 - 100) > 5);
+    }
+    // 流程耗时
+    const t2 = ['t-pick','t-grab','t-check','t-pack','t-load']
+      .reduce((s,k) => s + (parseInt(state.pcts[k])||0), 0);
+    const t2el = document.getElementById('pct-total-t');
+    if (t2el) {
+      t2el.textContent = '总和：' + t2 + '%';
+      t2el.classList.toggle('warn', Math.abs(t2 - 100) > 5);
+    }
+  }
+}
+
+// 严重程度评分
+function bindSevs() {
+  document.querySelectorAll('[data-sev]').forEach(group => {
+    const k = group.dataset.sev;
+    group.querySelectorAll('.sev-btn').forEach(btn => {
+      if (state.sevs[k] === parseInt(btn.dataset.val)) btn.classList.add('selected');
+      btn.addEventListener('click', () => {
+        const v = parseInt(btn.dataset.val);
+        if (state.sevs[k] === v) {
+          delete state.sevs[k];
+          btn.classList.remove('selected');
+        } else {
+          state.sevs[k] = v;
+          group.querySelectorAll('.sev-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+        }
+        saveState();
+      });
+    });
+  });
+}
+
+// ===== 导出 Markdown =====
+function buildMarkdown() {
+  const m = state.meta;
+  const v = state.values;
+  const p = state.picks;
+  const mu = state.multis;
+  const pc = state.pcts;
+  const sv = state.sevs;
+  const dp = state.datapull;
+
+  const get = (k, d='—') => v[k] || d;
+  const sevLabel = (n) => n ? ('★'.repeat(n) + '☆'.repeat(5-n) + ' (' + n + '/5)') : '—';
+  const pick = (k, map) => p[k] ? (map[p[k]] || p[k]) : '—';
+  const multi = (k, map) => {
+    const arr = mu[k] || [];
+    if (arr.length === 0) return '—';
+    return arr.map(x => map[x] || x).join('、');
+  };
+
+  let md = '';
+  md += '# 柳工配件库 · 系统/订单/流程 深度调研报告\n\n';
+  md += `> 调研日期：${m.date || '—'}  ·  调研人员：${m.surveyor || '—'}  ·  受访人：${m.contact || '—'}  ·  时长：${m.duration || '—'}\n\n`;
+  md += '---\n\n';
+
+  // ===== 数据拉取清单 =====
+  md += '## 📦 关键数据拉取情况\n\n';
+  let gotCount = 0;
+  DATA_LIST.forEach(d => {
+    const got = dp[d.id];
+    if (got) gotCount++;
+    md += `- ${got ? '✅' : '⬜'} ${d.text}\n`;
+  });
+  md += `\n**拉取进度：${gotCount} / ${DATA_LIST.length}**\n\n`;
+  md += '---\n\n';
+
+  // ===== Part 1: 订单 流程 =====
+  md += '## Part 1 · 订单 · 流程\n\n';
+
+  md += '### 订单量基线\n\n';
+  md += `| 指标 | 数值 |\n|---|---|\n`;
+  md += `| 日均订单数（峰/平/谷） | ${get('o-peak')} / ${get('o-avg')} / ${get('o-low')} 单 |\n`;
+  md += `| 单订单 SKU 数 / 件数 | ${get('o-skuperorder')} 行 / ${get('o-itemperorder')} 件 |\n`;
+  md += `| 最大单 SKU 数 | ${get('o-maxorder')} |\n`;
+  md += `| 订单时窗 | ${pick('window', {'1h':'≤ 1 小时','4h':'≤ 4 小时','1d':'当日','1d+':'次日+'})} |\n\n`;
+  if (v['window-detail']) md += `> ${v['window-detail']}\n\n`;
+
+  md += '### 订单类型分布\n\n';
+  md += `| 类型 | 占比 |\n|---|---|\n`;
+  md += `| JIT 紧急 | ${pc.jit ?? '—'}% |\n`;
+  md += `| 普通配送 | ${pc.normal ?? '—'}% |\n`;
+  md += `| 售后散单 | ${pc.aftersales ?? '—'}% |\n\n`;
+
+  md += '### 关键流程时间\n\n';
+  md += `| 指标 | 数值 |\n|---|---|\n`;
+  md += `| 单订单端到端（平均/最长） | ${get('lead-avg')} / ${get('lead-max')} 分钟 |\n`;
+  md += `| 拣货员日均效率 | ${get('eff-picker')} 单/日·人 |\n`;
+  md += `| 复核员日均效率 | ${get('eff-checker')} 单/日·人 |\n`;
+  md += `| 错拣率 | ${get('qa-misspick')}% |\n`;
+  md += `| 准时率 | ${get('qa-ontime')}% |\n`;
+  md += `| 客诉率 | ${get('qa-claim')}% |\n\n`;
+
+  md += '### 各环节耗时占比\n\n';
+  md += `| 环节 | 占比 |\n|---|---|\n`;
+  md += `| 拣货走动 | ${pc['t-pick'] ?? '—'}% |\n`;
+  md += `| 翻箱取件 | ${pc['t-grab'] ?? '—'}% |\n`;
+  md += `| 复核 / 核对 | ${pc['t-check'] ?? '—'}% |\n`;
+  md += `| 包装 | ${pc['t-pack'] ?? '—'}% |\n`;
+  md += `| 装车 / 其他 | ${pc['t-load'] ?? '—'}% |\n\n`;
+
+  md += '### 波动性\n\n';
+  md += `- **订单波峰时段**：${multi('peak-time', {'morning':'每日早班','evening':'每日晚班','monday':'周一','friday':'周五','month-end':'月末','month-start':'月初'})}\n`;
+  md += `- **峰谷倍数**：${get('peak-ratio')} 倍\n`;
+  md += `- **急单占比**：${get('rush-ratio')}%\n\n`;
+  if (v['order-notes']) md += `> ${v['order-notes']}\n\n`;
+  md += '---\n\n';
+
+  // ===== Part 2: 系统现状 =====
+  md += '## Part 2 · 系统现状\n\n';
+
+  md += '### 现有系统\n\n';
+  md += `- **WMS 类型**：${pick('wms-type', {'自研':'自研系统','商用':'商用品牌','excel':'Excel/纸质'})}\n`;
+  md += `- **WMS 名称**：${get('wms-name')}\n`;
+  md += `- **WMS 功能覆盖**：${multi('wms-features', {'货位':'货位管理','批次':'批次管理','CID':'CID 容器','工位':'工位级配送','RFID':'RFID 集成','盘点':'循环盘点','预警':'安全库存预警','路径':'拣货路径优化','电子单':'无纸化作业'})}\n`;
+  md += `- **其他系统**：${multi('other-sys', {'TMS':'TMS 运输','ERP':'ERP','财务':'财务','OA':'OA','GPS':'GPS 跟踪','BI':'BI 看板'})}\n\n`;
+
+  md += '### 与五菱的对接\n\n';
+  md += `- **对接方式**：${pick('mes-link', {'api':'API 实时接口','edi':'EDI 文件','excel':'Excel/邮件','manual':'人工录入'})}\n`;
+  md += `- **同步频率**：${pick('sync-freq', {'realtime':'实时','hourly':'每小时','daily':'每日','ondemand':'按需'})}\n`;
+  md += `- **共享数据**：${multi('data-shared', {'订单':'订单','库存':'库存','发货':'发货状态','批次':'批次/CID','工位':'工位信息','质量':'质量异常'})}\n\n`;
+
+  md += '### 数据质量\n\n';
+  md += `- **SKU 编码统一性**：${pick('sku-std', {'all':'各系统统一','partial':'部分一致','no':'不一致'})}\n`;
+  md += `- **账实差异（数量/SKU）**：${get('inv-diff')}% / ${get('inv-sku-diff')}%\n`;
+  md += `- **货位颗粒度**：${pick('loc-grain', {'zone':'仅大区位','row':'区+排','cell':'区+排+层','full':'区+排+列+层'})}\n`;
+  md += `- **条码覆盖（SKU/货位）**：${get('barcode-sku')}% / ${get('barcode-loc')}%\n\n`;
+
+  md += '### 系统痛点评分（5 分制，分数越高越痛苦）\n\n';
+  md += `| 维度 | 评分 |\n|---|---|\n`;
+  md += `| 查询库存 | ${sevLabel(sv['sys-query'])} |\n`;
+  md += `| 生成拣货单 | ${sevLabel(sv['sys-pickorder'])} |\n`;
+  md += `| 盘点 | ${sevLabel(sv['sys-stock'])} |\n`;
+  md += `| 异常订单 | ${sevLabel(sv['sys-exception'])} |\n\n`;
+  if (v['sys-notes']) md += `> ${v['sys-notes']}\n\n`;
+  md += '---\n\n';
+
+  // ===== Part 3: 异常 + 访谈 =====
+  md += '## Part 3 · 异常 · 访谈\n\n';
+
+  md += '### 异常处理\n\n';
+  if (v['ex-special']) md += `**特殊订单**：${v['ex-special']}\n\n`;
+  if (v['ex-shortage']) md += `**缺货预警**：${v['ex-shortage']}\n\n`;
+  md += `**退货**：退货率 ${get('ex-return')}% · 月均 ${get('ex-return-cnt')} 次\n\n`;
+  if (v['ex-return-note']) md += `> ${v['ex-return-note']}\n\n`;
+  md += `**盘点**：频率 ${pick('stock-freq', {'day':'每日','week':'每周','month':'每月','quarter':'每季'})} · 单次 ${get('stock-hours')} 小时 · ${get('stock-people')} 人\n\n`;
+  md += `**客诉常见类型**：${multi('claims', {'late':'送达延迟','wrong':'送错件','short':'缺件少数','damage':'货损','quality':'质量问题','info':'信息错误'})}\n\n`;
+  if (v['claim-detail']) md += `> ${v['claim-detail']}\n\n`;
+
+  md += '### 访谈速记\n\n';
+  if (v['iv-manager']) {
+    md += '#### 🧑‍💼 仓库主任 / IT 负责人\n\n';
+    md += `> ${v['iv-manager'].replace(/\n/g, '\n> ')}\n\n`;
+  }
+  if (v['iv-worker']) {
+    md += '#### 👷 资深拣货员 / 仓管员\n\n';
+    md += `> ${v['iv-worker'].replace(/\n/g, '\n> ')}\n\n`;
+  }
+  if (v['iv-customer']) {
+    md += '#### 🤝 客户对接人 / 配送主管\n\n';
+    md += `> ${v['iv-customer'].replace(/\n/g, '\n> ')}\n\n`;
+  }
+  if (v['iv-quotes']) {
+    md += '#### ⭐ 金句收集\n\n';
+    md += `> ${v['iv-quotes'].replace(/\n/g, '\n> ')}\n\n`;
+  }
+
+  md += '### 组织对自动化的态度\n\n';
+  md += `- **总体态度**：${pick('att-overall', {'support':'积极支持','neutral':'中立观望','resist':'担心抵触'})}\n`;
+  md += `- **主要顾虑**：${multi('concerns', {'job':'人员替代','cost':'投资回报','stable':'稳定性','learn':'学习成本','custom':'柔性差','vendor':'供应商绑定'})}\n\n`;
+  if (v['todos']) {
+    md += '### 未明确事项 / 下次跟进\n\n';
+    md += `> ${v['todos'].replace(/\n/g, '\n> ')}\n\n`;
+  }
+  md += '---\n\n';
+
+  // ===== 自动洞察 =====
+  md += '## 📌 自动生成：调研要点速览\n\n';
+
+  // 1. JIT 比例
+  if (pc.jit !== undefined && pc.jit >= 50) {
+    md += '- ⚡ **JIT 紧急订单占比 ' + pc.jit + '%**：JIT 节拍是核心 KPI，方案必须围绕「拣货→复核→配送」时效设计\n';
+  }
+  // 2. 流程瓶颈
+  if (pc['t-pick'] && pc['t-pick'] >= 35) {
+    md += '- 🏃 **拣货走动耗时 ' + pc['t-pick'] + '%**：是最大瓶颈 → 货到人 AMR 价值突出\n';
+  }
+  if (pc['t-check'] && pc['t-check'] >= 20) {
+    md += '- 🔍 **复核耗时 ' + pc['t-check'] + '%**：占比偏高 → AI 视觉复核应升级为必选\n';
+  }
+  // 3. 系统缺口
+  const wmsFeatures = mu['wms-features'] || [];
+  const missing = ['货位','批次','CID','工位','RFID'].filter(f => !wmsFeatures.includes(f));
+  if (missing.length >= 3) {
+    md += '- 🖥 **WMS 缺少 ' + missing.length + ' 项关键功能**（' + missing.join('、') + '）：现 WMS 需升级或替换\n';
+  }
+  // 4. 五菱对接
+  if (p['mes-link'] === 'manual' || p['mes-link'] === 'excel') {
+    md += '- ⚠️ **与五菱对接靠人工/Excel**：必须建立 MES 直连接口，否则自动化效果打折\n';
+  }
+  // 5. 痛点评分
+  const painItems = [];
+  if (sv['sys-query'] >= 4) painItems.push('查询库存');
+  if (sv['sys-pickorder'] >= 4) painItems.push('生成拣货单');
+  if (sv['sys-stock'] >= 4) painItems.push('盘点');
+  if (sv['sys-exception'] >= 4) painItems.push('异常处理');
+  if (painItems.length > 0) {
+    md += '- 🔴 **高痛点环节**：' + painItems.join('、') + ' — 这些是 WMS 改造首要发力点\n';
+  }
+  // 6. 自动化态度
+  if (p['att-overall'] === 'resist') {
+    md += '- 🚨 **组织有抵触情绪**：方案推进需配套培训计划与人员安抚措施\n';
+  }
+  md += '\n';
+
+  // 数据完整性
+  const dataGotPct = Math.round(gotCount / DATA_LIST.length * 100);
+  md += `- 📊 **关键数据拉取进度 ${dataGotPct}%** `;
+  if (dataGotPct < 50) md += '— ⚠️ 数据缺口大，方案设计需基于假设\n';
+  else if (dataGotPct < 80) md += '— ⚠ 大部分数据已拿到，少数缺口需后续补充\n';
+  else md += '— ✅ 数据较齐全，可支撑方案细化\n';
+
+  md += '\n---\n\n';
+  md += `*报告生成：${new Date().toLocaleString('zh-CN')}*\n`;
+
+  return md;
+}
+
+document.getElementById('export-btn').addEventListener('click', () => {
+  const md = buildMarkdown();
+  document.getElementById('md-output').textContent = md;
+  const filledCount = Object.keys(state.values).filter(k => state.values[k]).length;
+  const picksCount = Object.keys(state.picks).length;
+  const multisCount = Object.values(state.multis).reduce((s,a) => s + a.length, 0);
+  document.getElementById('modal-sub').textContent =
+    `${filledCount} 项数据 · ${picksCount + multisCount} 项选择`;
+  document.getElementById('modal').classList.add('show');
+});
+
+document.getElementById('modal-close').addEventListener('click', () => {
+  document.getElementById('modal').classList.remove('show');
+});
+
+document.getElementById('copy-btn').addEventListener('click', async () => {
+  const md = document.getElementById('md-output').textContent;
+  try {
+    await navigator.clipboard.writeText(md);
+    toast('已复制 ✓');
+  } catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = md;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); toast('已复制 ✓'); }
+    catch (_) { toast('复制失败 · 请长按选中'); }
+    document.body.removeChild(ta);
+  }
+});
+
+document.getElementById('download-btn').addEventListener('click', () => {
+  const md = document.getElementById('md-output').textContent;
+  const fname = `系统订单流程_${state.meta.date || 'undated'}.md`;
+  const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fname;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    URL.revokeObjectURL(a.href);
+    document.body.removeChild(a);
+  }, 100);
+  toast('已下载 ' + fname);
+});
+
+// 重置
+const confirmModal = document.getElementById('confirm-modal');
+document.getElementById('reset-btn').addEventListener('click', () => {
+  confirmModal.classList.add('show');
+});
+document.getElementById('confirm-close').addEventListener('click', () => {
+  confirmModal.classList.remove('show');
+});
+document.getElementById('confirm-cancel').addEventListener('click', () => {
+  confirmModal.classList.remove('show');
+});
+document.getElementById('confirm-ok').addEventListener('click', () => {
+  localStorage.removeItem(STORAGE_KEY);
+  state = {
+    meta: { date:'', surveyor:'', contact:'', duration:'' },
+    values: {}, picks: {}, multis: {}, pcts: {}, sevs: {}, datapull: {},
+  };
+  confirmModal.classList.remove('show');
+  // 重新初始化所有
+  bindMeta();
+  renderDataList();
+  bindInputs();
+  bindPicks();
+  bindMultis();
+  bindPcts();
+  bindSevs();
+  // 清空所有 input/textarea/选择视觉
+  document.querySelectorAll('input[type=text], input[type=number], textarea').forEach(el => {
+    if (!el.closest('.meta-item')) el.value = '';
+  });
+  document.querySelectorAll('.pick-btn.selected, .sev-btn.selected').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('input[type=range]').forEach(r => {
+    const def = {'jit':50,'normal':35,'aftersales':15,'t-pick':40,'t-grab':20,'t-check':15,'t-pack':15,'t-load':10};
+    r.value = def[r.dataset.pct] || 0;
+  });
+  document.querySelectorAll('[id^="pct-"]').forEach(el => {
+    if (el.id !== 'pct-total' && el.id !== 'pct-total-t') {
+      const k = el.id.replace('pct-','');
+      const def = {'jit':50,'normal':35,'aftersales':15,'t-pick':40,'t-grab':20,'t-check':15,'t-pack':15,'t-load':10};
+      el.textContent = (def[k] || 0) + '%';
+    }
+  });
+  bindPcts();
+  window.scrollTo({ top: 0 });
+  toast('已重置 ✓');
+});
+
+// Toast
+let toastTimer = null;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+// 启动
+loadState();
+bindMeta();
+renderDataList();
+bindInputs();
+bindPicks();
+bindMultis();
+bindPcts();
+bindSevs();
+</script>
+</body>
+</html>

@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>柳工配件库 · 自动化升级布局方案</title>
+<style>
+  :root {
+    --navy: #1A2B4A;
+    --navy-2: #2C4870;
+    --navy-3: #3E5C85;
+    --navy-4: #5878A8;
+    --gold: #E89B3D;
+    --gold-l: #F5D89C;
+    --gold-dk: #B57920;
+    --gold-bg: #FDF5E6;
+    --cream: #FBF5E9;
+    --bg: #F5F7FA;
+    --white: #FFFFFF;
+    --border: #E2E8F0;
+    --border-dk: #CBD5E1;
+    --text-dk: #1A2B4A;
+    --text-mid: #475569;
+    --text-lt: #94A3B8;
+    --green: #10B981;
+    --green-dk: #047857;
+    --amber: #F59E0B;
+    --red: #C13C2E;
+    --shadow-sm: 0 1px 3px rgba(15,30,55,0.08);
+    --shadow: 0 4px 18px rgba(15,30,55,0.08);
+    --shadow-lg: 0 14px 40px rgba(15,30,55,0.15);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "微软雅黑", sans-serif;
+    background: var(--bg);
+    color: var(--text-dk);
+    font-size: 14px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ========== 顶部 banner ========== */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+    color: #fff;
+    padding: 48px 40px 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -80px;
+    top: -80px;
+    width: 360px;
+    height: 360px;
+    background: var(--gold);
+    opacity: 0.08;
+    border-radius: 50%;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    right: 20px;
+    bottom: -120px;
+    width: 220px;
+    height: 220px;
+    background: var(--gold);
+    opacity: 0.05;
+    border-radius: 50%;
+  }
+  .hero-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+  }
+  .eyebrow {
+    color: var(--gold-l);
+    font-size: 11px;
+    letter-spacing: 3px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(232,155,61,0.15);
+    border-radius: 4px;
+  }
+  h1 {
+    font-size: 36px;
+    font-weight: 800;
+    margin: 0 0 12px;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+  }
+  .subtitle {
+    font-size: 17px;
+    color: rgba(255,255,255,0.85);
+    margin: 0 0 30px;
+    max-width: 720px;
+  }
+  .key-params {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-top: 28px;
+  }
+  .param-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+  .param-card .label {
+    font-size: 10px;
+    color: var(--gold-l);
+    letter-spacing: 1.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .param-card .value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .param-card .value .unit {
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    margin-left: 4px;
+    font-weight: 500;
+  }
+  .param-card .hint {
+    font-size: 11px;
+    color: rgba(255,255,255,0.55);
+    margin-top: 4px;
+  }
+
+  /* ========== 主体内容 ========== */
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 40px 56px;
+  }
+
+  section {
+    margin-top: 52px;
+  }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .section-head h2 {
+    font-size: 24px;
+    font-weight: 800;
+    margin: 0;
+    color: var(--navy);
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  .section-head h2 .num {
+    color: var(--gold);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+  .section-head .desc {
+    font-size: 13px;
+    color: var(--text-mid);
+    max-width: 560px;
+  }
+
+  /* ========== 平面布局图 SVG 容器 ========== */
+  .layout-box {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    box-shadow: var(--shadow);
+  }
+  .layout-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* SVG 内部样式 */
+  .zone-label {
+    font-family: "微软雅黑", sans-serif;
+    fill: #fff;
+    font-weight: 700;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+  }
+  .zone-sub {
+    font-family: "微软雅黑", sans-serif;
+    fill: rgba(255,255,255,0.85);
+    font-size: 11px;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+  }
+  .dim-label {
+    font-family: "微软雅黑", sans-serif;
+    fill: var(--text-lt);
+    font-size: 10px;
+    text-anchor: middle;
+  }
+  .flow-label {
+    font-family: "微软雅黑", sans-serif;
+    fill: var(--gold-dk);
+    font-size: 11px;
+    font-weight: 600;
+    text-anchor: middle;
+  }
+
+  /* 图例 */
+  .legend {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 22px;
+    border-top: 1px solid var(--border);
+  }
+  .legend-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .legend-color {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .legend-text .lt {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .legend-text .ld {
+    font-size: 11px;
+    color: var(--text-mid);
+    line-height: 1.5;
+  }
+
+  /* ========== 四区详解卡片 ========== */
+  .zones-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+  .zone-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+  }
+  .zone-card-head {
+    padding: 18px 22px 16px;
+    color: #fff;
+    position: relative;
+  }
+  .zone-card-head.zoneA { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); }
+  .zone-card-head.zoneB { background: linear-gradient(135deg, var(--gold-dk) 0%, var(--gold) 100%); }
+  .zone-card-head.zoneB2 { background: linear-gradient(135deg, #5C3A18 0%, #7A4D1F 100%); border-bottom: 3px solid var(--gold-l); }
+  .zone-card-head.zoneC { background: linear-gradient(135deg, var(--navy-3) 0%, var(--navy-4) 100%); }
+  .zone-card-head.zoneD { background: linear-gradient(135deg, #7A5230 0%, #A37347 100%); }
+  .zone-tag {
+    display: inline-block;
+    padding: 3px 9px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 4px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .zone-card-head h3 {
+    margin: 0 0 4px;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+  .zone-card-head .zone-meta {
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+    display: flex;
+    gap: 14px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .zone-card-head .zone-meta span strong {
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+    margin-left: 3px;
+  }
+
+  .zone-body {
+    padding: 18px 22px 22px;
+    flex: 1;
+  }
+  .zone-body h4 {
+    font-size: 11px;
+    color: var(--text-lt);
+    margin: 14px 0 8px;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .zone-body h4:first-child { margin-top: 0; }
+
+  .equip-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 8px;
+  }
+  .equip-list li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    padding: 9px 0;
+    border-bottom: 1px dashed var(--border);
+    align-items: baseline;
+  }
+  .equip-list li:last-child { border-bottom: none; }
+  .equip-name {
+    font-size: 13px;
+    color: var(--text-dk);
+    line-height: 1.45;
+  }
+  .equip-name b {
+    color: var(--navy);
+    font-weight: 700;
+  }
+  .equip-name .equip-spec {
+    color: var(--text-mid);
+    font-size: 11.5px;
+    margin-top: 2px;
+    display: block;
+  }
+  .equip-qty {
+    font-size: 12px;
+    color: var(--gold-dk);
+    font-weight: 700;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .zone-rationale {
+    background: var(--cream);
+    border-left: 3px solid var(--gold);
+    padding: 11px 14px;
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    color: var(--text-dk);
+    line-height: 1.65;
+    margin-top: 14px;
+  }
+  .zone-rationale b { color: var(--navy); }
+
+  /* ========== 投资估算表 ========== */
+  .invest-table-wrap {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  table.invest {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  table.invest thead th {
+    background: var(--navy);
+    color: #fff;
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+  table.invest thead th:nth-child(n+3) { text-align: right; }
+  table.invest tbody tr {
+    border-bottom: 1px solid var(--border);
+  }
+  table.invest tbody tr.layer-row {
+    background: var(--cream);
+  }
+  table.invest tbody td {
+    padding: 11px 16px;
+    color: var(--text-dk);
+    vertical-align: top;
+  }
+  table.invest tbody td:nth-child(n+3) {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  table.invest tbody .layer-label {
+    font-weight: 800;
+    color: var(--navy);
+    font-size: 13px;
+  }
+  table.invest .item-name b { color: var(--navy); }
+  table.invest .item-name small {
+    display: block;
+    color: var(--text-mid);
+    font-size: 11px;
+    margin-top: 2px;
+  }
+  .price-cell {
+    font-weight: 700;
+    color: var(--navy);
+  }
+  .mov-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .mov-100 { background: #D1FAE5; color: var(--green-dk); }
+  .mov-high { background: #FEF3C7; color: var(--gold-dk); }
+  .mov-mid  { background: #DBEAFE; color: #1E40AF; }
+  .mov-low  { background: #FEE2E2; color: var(--red); }
+
+  table.invest tfoot td {
+    background: var(--navy);
+    color: #fff;
+    padding: 14px 16px;
+    font-weight: 800;
+    font-size: 14px;
+  }
+  table.invest tfoot td:nth-child(n+3) {
+    text-align: right;
+    color: var(--gold-l);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ========== 实施路径 ========== */
+  .roadmap {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .phase {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    position: relative;
+    box-shadow: var(--shadow-sm);
+  }
+  .phase-num {
+    position: absolute;
+    top: 18px;
+    right: 22px;
+    font-size: 44px;
+    font-weight: 800;
+    color: var(--gold-l);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .phase-tag {
+    display: inline-block;
+    background: var(--navy);
+    color: var(--gold);
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin-bottom: 12px;
+  }
+  .phase h3 {
+    margin: 0 0 4px;
+    font-size: 17px;
+    color: var(--navy);
+    font-weight: 800;
+  }
+  .phase .span {
+    font-size: 11px;
+    color: var(--text-mid);
+    margin-bottom: 12px;
+  }
+  .phase ul {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 13px;
+    color: var(--text-dk);
+  }
+  .phase ul li {
+    margin: 6px 0;
+    line-height: 1.5;
+  }
+  .phase-investment {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border);
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-mid);
+  }
+  .phase-investment strong {
+    color: var(--gold-dk);
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  /* ========== ASRS 比较 ========== */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .compare-card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    border-top: 4px solid var(--gold);
+  }
+  .compare-card.best { border-top-color: var(--green); background: linear-gradient(180deg, #ECFDF5 0%, #fff 60%); }
+  .compare-card.worst { border-top-color: var(--red); }
+  .compare-card h4 {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--navy);
+  }
+  .compare-card .verdict {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .compare-card.best .verdict { color: var(--green-dk); }
+  .compare-card .verdict.amber { color: var(--gold-dk); }
+  .compare-card.worst .verdict { color: var(--red); }
+  .compare-card .compare-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 10px;
+    margin: 12px 0;
+    padding: 10px 0;
+    border-top: 1px dashed var(--border);
+    border-bottom: 1px dashed var(--border);
+  }
+  .compare-card .compare-meta div {
+    font-size: 11px;
+    color: var(--text-mid);
+  }
+  .compare-card .compare-meta b {
+    color: var(--navy);
+    font-size: 12px;
+    display: block;
+  }
+  .compare-card .body {
+    font-size: 12.5px;
+    color: var(--text-dk);
+    line-height: 1.6;
+  }
+
+  /* ========== 底部 ========== */
+  footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.7);
+    padding: 28px 40px;
+    text-align: center;
+    font-size: 12px;
+    margin-top: 56px;
+  }
+  footer .gold { color: var(--gold); font-weight: 700; }
+
+  /* ========== 打印 ========== */
+  @media print {
+    body { background: #fff; font-size: 11px; }
+    .hero { padding: 24px 28px; page-break-after: avoid; }
+    section { margin-top: 28px; page-break-inside: avoid; }
+    .zones-grid { grid-template-columns: repeat(2, 1fr); }
+    .roadmap, .compare-grid { page-break-inside: avoid; }
+    .layout-box { page-break-inside: avoid; }
+  }
+
+  /* ========== 响应式 ========== */
+  @media (max-width: 880px) {
+    .key-params { grid-template-columns: repeat(2, 1fr); }
+    .zones-grid, .roadmap, .compare-grid, .legend {
+      grid-template-columns: 1fr;
+    }
+    main { padding: 0 20px 40px; }
+    .hero { padding: 32px 24px 40px; }
+    h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ 顶部 Hero ============ -->
+<header class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">SOLUTION DESIGN · v0.4 · 2026.05</span>
+    <h1>柳工配件库 · 自动化升级布局方案</h1>
+    <p class="subtitle">
+      基于现场调研数据 + 业务模式分析 + <b style="color:#fff;">3 号线批次锁定约束</b>，
+      按「储存 · 搬运 · 拣选 · 复核」环节分解，给出
+      <b style="color:#fff;">分品类 × 分产线 × 分环节</b> 的混合自动化方案 ——
+      不强行用单一技术覆盖全部场景，让每一种 SKU 都得到最匹配的处理。
+    </p>
+
+    <div class="key-params">
+      <div class="param-card">
+        <div class="label">总作业面积</div>
+        <div class="value">4,387<span class="unit">㎡</span></div>
+        <div class="hint">100% 柳工自营业务</div>
+      </div>
+      <div class="param-card">
+        <div class="label">梁下净高</div>
+        <div class="value">8.0<span class="unit">m</span></div>
+        <div class="hint">支撑 5–6 层货架</div>
+      </div>
+      <div class="param-card">
+        <div class="label">地面承重</div>
+        <div class="value">5,000<span class="unit">kg/㎡</span></div>
+        <div class="hint">远超一般物流仓</div>
+      </div>
+      <div class="param-card">
+        <div class="label">SKU 规模</div>
+        <div class="value">6,800<span class="unit">种</span></div>
+        <div class="hint">小件占 93% · 长尾极重</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ 关键业务约束（v0.2 新增）============ -->
+  <section style="margin-top:32px;">
+    <div style="background:linear-gradient(135deg, #FEF3C7 0%, #FBF5E9 100%); border:1px solid var(--amber); border-left:4px solid var(--amber); border-radius:12px; padding:18px 22px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span style="background:var(--amber);color:#fff;font-size:10px;font-weight:800;letter-spacing:2px;padding:3px 10px;border-radius:4px;">⚡ KEY CONSTRAINT</span>
+        <h3 style="margin:0;font-size:17px;font-weight:800;color:var(--navy);">业务约束识别  ·  3 号线特殊规则</h3>
+      </div>
+      <p style="margin:0;font-size:13.5px;color:var(--text-dk);line-height:1.7;">
+        调研发现：<b>柳工 1/2 号线业务不看批次</b>，可走标准货到人模式；
+        <b>柳工 3 号线所有 SKU 必须按指定批次出库</b>，且<b style="color:var(--red);">基本一单一件</b> —
+        意味着 3 号线的<b>错件代价极大</b>（整单作废），同一 SKU 不同批次的料盒必须严格隔离。
+        因此 B 区被拆为 B1 / B2 两个子区，B2 专用于 3 号线，采用 <b>物理隔离 + AMR 专车 + 双重扫码 + AI 视觉批次识别</b> 的强复核模式。
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ Section 1: 平面布局图 ============ -->
+  <section>
+    <div class="section-head">
+      <h2><span class="num">01</span> 仓库平面布局示意</h2>
+      <div class="desc">
+        按品类异质性分为 4 个储存区 + 收发货带 + 集货复核区，AGV/AMR 在区与区之间穿行。尺寸为示意。
+      </div>
+    </div>
+
+    <div class="layout-box">
+      <svg class="layout-svg" viewBox="0 0 1200 720" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- 箭头 -->
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5"
+                  markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#E89B3D"/>
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#F1F4F8" stroke-width="1"/>
+          </pattern>
+          <linearGradient id="zoneA-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1A2B4A"/>
+            <stop offset="100%" stop-color="#2C4870"/>
+          </linearGradient>
+          <linearGradient id="zoneB-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#E89B3D"/>
+            <stop offset="100%" stop-color="#B57920"/>
+          </linearGradient>
+          <linearGradient id="zoneC-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#3E5C85"/>
+            <stop offset="100%" stop-color="#5878A8"/>
+          </linearGradient>
+          <linearGradient id="zoneD-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#A37347"/>
+            <stop offset="100%" stop-color="#7A5230"/>
+          </linearGradient>
+        </defs>
+
+        <!-- 仓库外轮廓 -->
+        <rect x="40" y="40" width="1120" height="640" fill="url(#grid)"
+              stroke="#1A2B4A" stroke-width="3" rx="8"/>
+
+        <!-- 罗盘 -->
+        <g transform="translate(1110, 175)">
+          <circle cx="0" cy="0" r="18" fill="#fff" stroke="#1A2B4A" stroke-width="1.5"/>
+          <text x="0" y="-3" font-size="9" text-anchor="middle" fill="#1A2B4A" font-weight="700">N</text>
+          <path d="M 0 -10 L 4 4 L 0 1 L -4 4 Z" fill="#E89B3D"/>
+        </g>
+
+        <!-- 比例尺标识 -->
+        <g transform="translate(1060, 660)">
+          <line x1="0" y1="0" x2="80" y2="0" stroke="#475569" stroke-width="2"/>
+          <line x1="0" y1="-5" x2="0" y2="5" stroke="#475569" stroke-width="2"/>
+          <line x1="80" y1="-5" x2="80" y2="5" stroke="#475569" stroke-width="2"/>
+          <text x="40" y="-8" text-anchor="middle" font-size="10" fill="#475569" font-weight="600">10 m</text>
+        </g>
+
+        <!-- 收货区（顶部） -->
+        <rect x="60" y="70" width="1080" height="80" fill="#FBF5E9" stroke="#E89B3D" stroke-width="2" stroke-dasharray="6 4" rx="4"/>
+        <text x="600" y="100" class="zone-label" fill="#B57920" font-size="14">收货区 · 暂存</text>
+        <text x="600" y="118" font-size="11" text-anchor="middle" fill="#7A5230">来料卸货 · 核对 · 暂存等待上架  ──  人 + 托盘 AGV</text>
+        <text x="600" y="135" font-size="10" text-anchor="middle" fill="#94A3B8">建议预留 ~8% 面积（650 ㎡）</text>
+
+        <!-- 月台标识（顶部上方） -->
+        <g>
+          <rect x="80" y="48" width="40" height="22" fill="#E89B3D" rx="2"/>
+          <text x="100" y="63" font-size="10" text-anchor="middle" fill="#fff" font-weight="700">月台</text>
+          <rect x="380" y="48" width="40" height="22" fill="#E89B3D" rx="2"/>
+          <text x="400" y="63" font-size="10" text-anchor="middle" fill="#fff" font-weight="700">月台</text>
+          <rect x="680" y="48" width="40" height="22" fill="#E89B3D" rx="2"/>
+          <text x="700" y="63" font-size="10" text-anchor="middle" fill="#fff" font-weight="700">月台</text>
+          <rect x="980" y="48" width="40" height="22" fill="#E89B3D" rx="2"/>
+          <text x="1000" y="63" font-size="10" text-anchor="middle" fill="#fff" font-weight="700">月台</text>
+          <text x="1095" y="63" font-size="10" fill="#C13C2E">⚠ 需加装登车桥</text>
+        </g>
+
+        <!-- A 区：大件托盘（右侧）-->
+        <rect x="780" y="170" width="360" height="320" fill="url(#zoneA-grad)" rx="6"/>
+        <text x="960" y="225" class="zone-label" font-size="22">A 区</text>
+        <text x="960" y="255" class="zone-label" font-size="15">大件托盘储存</text>
+        <text x="960" y="285" class="zone-sub">重型货架 5–6 层 + 托盘 AGV</text>
+        <text x="960" y="305" class="zone-sub">≈ 450 SKU  ·  ≈ 770 ㎡</text>
+        <!-- 货架示意 -->
+        <g opacity="0.45">
+          <rect x="810" y="330" width="320" height="14" fill="#fff" stroke="#E89B3D"/>
+          <rect x="810" y="354" width="320" height="14" fill="#fff" stroke="#E89B3D"/>
+          <rect x="810" y="378" width="320" height="14" fill="#fff" stroke="#E89B3D"/>
+          <rect x="810" y="402" width="320" height="14" fill="#fff" stroke="#E89B3D"/>
+          <rect x="810" y="426" width="320" height="14" fill="#fff" stroke="#E89B3D"/>
+        </g>
+        <text x="960" y="466" font-size="10" text-anchor="middle" fill="rgba(255,255,255,0.7)">↑ 5 层重型货架（示意）</text>
+
+        <!-- B 区：小件高频（左侧）拆分为 B1 + B2 -->
+        <!-- B1 上半：普通拣选 -->
+        <rect x="60" y="170" width="320" height="155" fill="url(#zoneB-grad)" rx="6"/>
+        <text x="100" y="200" class="zone-label" font-size="16">B1</text>
+        <text x="220" y="205" class="zone-label" font-size="13">柳工 1/2 号线</text>
+        <text x="220" y="225" class="zone-sub" font-size="11">普通拣选模式  ·  不看批次</text>
+        <text x="220" y="252" class="zone-sub">货到人 AMR + 移动料架</text>
+        <text x="220" y="272" class="zone-sub">SKU 标准拣选</text>
+        <!-- B1 料架示意 -->
+        <g opacity="0.4">
+          <rect x="85"  y="285" width="34" height="32" fill="#fff" stroke="#fff" stroke-width="1"/>
+          <rect x="135" y="285" width="34" height="32" fill="#fff" stroke="#fff" stroke-width="1"/>
+          <rect x="185" y="285" width="34" height="32" fill="#fff" stroke="#fff" stroke-width="1"/>
+          <rect x="235" y="285" width="34" height="32" fill="#fff" stroke="#fff" stroke-width="1"/>
+          <rect x="285" y="285" width="34" height="32" fill="#fff" stroke="#fff" stroke-width="1"/>
+        </g>
+
+        <!-- B2 下半：批次锁定模式（用深一点的色 + 金色边框警示） -->
+        <rect x="60" y="335" width="320" height="155" fill="#7A4D1F" stroke="#F5D89C" stroke-width="2" rx="6"/>
+        <text x="100" y="365" class="zone-label" font-size="16">B2</text>
+        <text x="220" y="368" class="zone-label" font-size="13">柳工 3 号线 专用</text>
+        <!-- 警示标签 -->
+        <rect x="155" y="378" width="130" height="18" fill="#F5D89C" rx="3"/>
+        <text x="220" y="391" font-size="10" text-anchor="middle" fill="#7A4D1F" font-weight="800">⚠ 一单一件 · 强批次</text>
+        <text x="220" y="412" class="zone-sub">AMR + 双重扫码（SKU + 批次）</text>
+        <text x="220" y="430" class="zone-sub">视觉复核 100%  ·  批次锁定</text>
+        <!-- B2 料架示意（带批次标签） -->
+        <g opacity="0.5">
+          <rect x="85"  y="445" width="34" height="32" fill="#fff" stroke="#F5D89C" stroke-width="1.5"/>
+          <text x="102" y="463" font-size="6" fill="#7A4D1F" text-anchor="middle">L01</text>
+          <rect x="135" y="445" width="34" height="32" fill="#fff" stroke="#F5D89C" stroke-width="1.5"/>
+          <text x="152" y="463" font-size="6" fill="#7A4D1F" text-anchor="middle">L02</text>
+          <rect x="185" y="445" width="34" height="32" fill="#fff" stroke="#F5D89C" stroke-width="1.5"/>
+          <text x="202" y="463" font-size="6" fill="#7A4D1F" text-anchor="middle">L03</text>
+          <rect x="235" y="445" width="34" height="32" fill="#fff" stroke="#F5D89C" stroke-width="1.5"/>
+          <text x="252" y="463" font-size="6" fill="#7A4D1F" text-anchor="middle">L04</text>
+          <rect x="285" y="445" width="34" height="32" fill="#fff" stroke="#F5D89C" stroke-width="1.5"/>
+          <text x="302" y="463" font-size="6" fill="#7A4D1F" text-anchor="middle">L05</text>
+        </g>
+
+        <!-- C 区：小件长尾（中间）-->
+        <rect x="400" y="170" width="360" height="280" fill="url(#zoneC-grad)" rx="6"/>
+        <text x="580" y="220" class="zone-label" font-size="22">C 区</text>
+        <text x="580" y="250" class="zone-label" font-size="15">小件长尾储存</text>
+        <text x="580" y="278" class="zone-sub">Mezzanine 2 层平台 + 拣选车</text>
+        <text x="580" y="297" class="zone-sub">≈ 4,600 SKU  ·  ≈ 750 ㎡（地面）+ 750 ㎡（夹层）</text>
+        <!-- 夹层示意（双层） -->
+        <g opacity="0.4">
+          <line x1="420" y1="335" x2="740" y2="335" stroke="#fff" stroke-width="1.5"/>
+          <text x="580" y="328" font-size="10" text-anchor="middle" fill="#fff">— 上层 —</text>
+          <text x="580" y="358" font-size="10" text-anchor="middle" fill="#fff">— 下层 —</text>
+          <rect x="430" y="370" width="36" height="36" fill="#fff"/>
+          <rect x="480" y="370" width="36" height="36" fill="#fff"/>
+          <rect x="530" y="370" width="36" height="36" fill="#fff"/>
+          <rect x="580" y="370" width="36" height="36" fill="#fff"/>
+          <rect x="630" y="370" width="36" height="36" fill="#fff"/>
+          <rect x="680" y="370" width="36" height="36" fill="#fff"/>
+        </g>
+        <text x="580" y="430" font-size="10" text-anchor="middle" fill="rgba(255,255,255,0.7)">↑ 夹层平台示意</text>
+
+        <!-- D 区：长形件（底部）-->
+        <rect x="60" y="510" width="700" height="100" fill="url(#zoneD-grad)" rx="6"/>
+        <text x="170" y="545" class="zone-label" font-size="18">D 区</text>
+        <text x="170" y="568" class="zone-sub" style="text-anchor:middle">长形件</text>
+        <text x="170" y="586" class="zone-sub" style="text-anchor:middle">悬臂式货架</text>
+        <text x="170" y="602" class="zone-sub" style="text-anchor:middle">≈ 400 SKU</text>
+        <!-- 悬臂货架示意 -->
+        <g opacity="0.4">
+          <line x1="280" y1="525" x2="280" y2="600" stroke="#fff" stroke-width="3"/>
+          <line x1="280" y1="540" x2="430" y2="540" stroke="#fff" stroke-width="2"/>
+          <line x1="280" y1="565" x2="430" y2="565" stroke="#fff" stroke-width="2"/>
+          <line x1="280" y1="590" x2="430" y2="590" stroke="#fff" stroke-width="2"/>
+          <line x1="500" y1="525" x2="500" y2="600" stroke="#fff" stroke-width="3"/>
+          <line x1="500" y1="540" x2="650" y2="540" stroke="#fff" stroke-width="2"/>
+          <line x1="500" y1="565" x2="650" y2="565" stroke="#fff" stroke-width="2"/>
+          <line x1="500" y1="590" x2="650" y2="590" stroke="#fff" stroke-width="2"/>
+        </g>
+
+        <!-- E 区：集货 + AI 复核 + RFID（右下）-->
+        <rect x="780" y="510" width="360" height="160" fill="#F5D89C" stroke="#B57920" stroke-width="2" rx="6"/>
+        <text x="960" y="548" font-size="18" text-anchor="middle" fill="#1A2B4A" font-weight="800">集货 · 复核 · 发货</text>
+        <text x="960" y="572" font-size="12" text-anchor="middle" fill="#475569">AI 视觉复核工作站</text>
+        <text x="960" y="590" font-size="12" text-anchor="middle" fill="#475569">RFID 龙门架  ·  Pick-to-Light</text>
+        <text x="960" y="618" font-size="11" text-anchor="middle" fill="#7A5230">↓ 经此处后发往月台装车 ↓</text>
+
+        <!-- ===== 动线箭头 ===== -->
+        <!-- 收货 → A -->
+        <path d="M 1010 155 Q 1050 165 1010 175" stroke="#E89B3D" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+        <!-- 收货 → B -->
+        <path d="M 220 155 Q 200 165 220 175" stroke="#E89B3D" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+        <!-- 收货 → C -->
+        <path d="M 580 155 Q 600 165 580 175" stroke="#E89B3D" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+
+        <!-- A → 集货 -->
+        <path d="M 870 495 L 870 510" stroke="#E89B3D" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+        <rect x="880" y="494" width="55" height="20" fill="#FBF5E9" stroke="#E89B3D" stroke-width="1" rx="3"/>
+        <text x="907" y="508" class="flow-label">大件出</text>
+        <!-- B → 集货（穿过中间） -->
+        <path d="M 380 460 L 760 560" stroke="#E89B3D" stroke-width="2.5" fill="none" marker-end="url(#arrow)" stroke-dasharray="6 3"/>
+        <rect x="510" y="485" width="86" height="20" fill="#FBF5E9" stroke="#E89B3D" stroke-width="1" rx="3"/>
+        <text x="553" y="499" class="flow-label">小件高频出</text>
+        <!-- C → 集货 -->
+        <path d="M 760 360 L 800 540" stroke="#E89B3D" stroke-width="2.5" fill="none" marker-end="url(#arrow)" stroke-dasharray="6 3"/>
+        <rect x="755" y="440" width="60" height="20" fill="#FBF5E9" stroke="#E89B3D" stroke-width="1" rx="3"/>
+        <text x="785" y="454" class="flow-label">长尾出</text>
+
+        <!-- 集货 → 月台（沿右侧走，避免穿过 A 区文字） -->
+        <path d="M 1140 590 L 1175 590 L 1175 150" stroke="#10B981" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+        <rect x="1095" y="370" width="80" height="22" fill="#fff" stroke="#10B981" stroke-width="1" rx="3"/>
+        <text x="1135" y="385" font-size="11" text-anchor="middle" fill="#047857" font-weight="700">配送至月台</text>
+
+        <!-- 主通道（横向） -->
+        <line x1="60" y1="500" x2="1140" y2="500" stroke="#CBD5E1" stroke-width="1" stroke-dasharray="3 3"/>
+        <text x="100" y="492" font-size="10" fill="#94A3B8">≥ 3.5m 主通道</text>
+      </svg>
+
+      <!-- 图例 -->
+      <div class="legend" style="grid-template-columns: repeat(5, 1fr);">
+        <div class="legend-item">
+          <div class="legend-color" style="background:linear-gradient(135deg,#1A2B4A,#2C4870);"></div>
+          <div class="legend-text">
+            <div class="lt">A · 大件托盘</div>
+            <div class="ld">压缩机、冷凝器 · 重型货架 5 层</div>
+          </div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background:linear-gradient(135deg,#E89B3D,#B57920);"></div>
+          <div class="legend-text">
+            <div class="lt">B1 · 普通拣选</div>
+            <div class="ld">柳工 1/2 号线 · AMR 货到人</div>
+          </div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background:#7A4D1F;border:2px solid #F5D89C;"></div>
+          <div class="legend-text">
+            <div class="lt">B2 · <span style="color:var(--red);">批次锁定</span></div>
+            <div class="ld">柳工 3 号线 · 一单一件</div>
+          </div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background:linear-gradient(135deg,#3E5C85,#5878A8);"></div>
+          <div class="legend-text">
+            <div class="lt">C · 小件长尾</div>
+            <div class="ld">5000 种少量周转 · Mezzanine</div>
+          </div>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color" style="background:linear-gradient(135deg,#A37347,#7A5230);"></div>
+          <div class="legend-text">
+            <div class="lt">D · 长形件</div>
+            <div class="ld">连接管 · 悬臂式 + 人工</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Section 2: 四区详解 ============ -->
+  <section>
+    <div class="section-head">
+      <h2><span class="num">02</span> 四区详细方案</h2>
+      <div class="desc">每个区按"设备清单 + 选型依据 + 关键参数"展开。设备数量为粗算，详细方案需基于跟班数据细化。</div>
+    </div>
+
+    <div class="zones-grid">
+      <!-- A 区 -->
+      <div class="zone-card">
+        <div class="zone-card-head zoneA">
+          <span class="zone-tag">ZONE A</span>
+          <h3>大件托盘储存</h3>
+          <div class="zone-meta">
+            <span>SKU<strong>~450</strong></span>
+            <span>面积<strong>~770 ㎡</strong></span>
+            <span>流量占比<strong>~30%</strong></span>
+          </div>
+        </div>
+        <div class="zone-body">
+          <h4>核心设备</h4>
+          <ul class="equip-list">
+            <li>
+              <span class="equip-name"><b>重型托盘货架</b>（5 层）
+                <span class="equip-spec">螺栓装配式，可拆装；单层 1000kg；标准 1.2m × 1.0m 托盘位</span>
+              </span>
+              <span class="equip-qty">~960 个托盘位</span>
+            </li>
+            <li>
+              <span class="equip-name"><b>托盘 AGV</b>（SLAM 激光导航）
+                <span class="equip-spec">载重 1.5t，差速驱动，容忍地面 ±8mm 平整度</span>
+              </span>
+              <span class="equip-qty">3–4 台</span>
+            </li>
+            <li>
+              <span class="equip-name"><b>充电桩</b>（落地式，可移位）
+                <span class="equip-spec">无需地面预埋，每 2 台 AGV 配 1 充电桩</span>
+              </span>
+              <span class="equip-qty">2 台</span>
+            </li>
+          </ul>
+          <h4>选型依据</h4>
+          <div class="zone-rationale">
+            压缩机等大件平均 8–20 kg、典型批量 5–20 件 / 单。托盘储存效率最高，<b>不上 ASRS</b> 因为：① 高频 SKU 不到 100，单点高频度不够；② 投资 500-800 万元，回收期超过 6 年；③ 残值率 ≤ 30%，可迁移性极差。<b>AGV + 5 层重型货架</b> 是性价比与可迁移性的最佳平衡。
+          </div>
+        </div>
+      </div>
+
+      <!-- B1 区：柳工 1/2 号线 普通拣选 -->
+      <div class="zone-card">
+        <div class="zone-card-head zoneB">
+          <span class="zone-tag">ZONE B1</span>
+          <h3>柳工 1/2 号线 · 普通拣选</h3>
+          <div class="zone-meta">
+            <span>SKU<strong>~900</strong></span>
+            <span>面积<strong>~380 ㎡</strong></span>
+            <span>流量占比<strong>~40%</strong></span>
+          </div>
+        </div>
+        <div class="zone-body">
+          <h4>核心设备</h4>
+          <ul class="equip-list">
+            <li>
+              <span class="equip-name"><b>潜伏式 AMR</b>（货到人）
+                <span class="equip-spec">载重 500-1000 kg，钻入移动料架底部，搬至拣选工作站</span>
+              </span>
+              <span class="equip-qty">3–5 台</span>
+            </li>
+            <li>
+              <span class="equip-name"><b>移动料架</b>（多层料盒）
+                <span class="equip-spec">4-6 层，每层放标准料盒；底部留 AMR 钻入空间</span>
+              </span>
+              <span class="equip-qty">~120 个</span>
+            </li>
+            <li>
+              <span class="equip-name"><b>拣选工作站</b>（带 Pick-to-Light）
+                <span class="equip-spec">AMR 把料架推到工人面前，灯光提示哪个料盒、几件</span>
+              </span>
+              <span class="equip-qty">2 个</span>
+            </li>
+          </ul>
+          <h4>选型依据</h4>
+          <div class="zone-rationale">
+            柳工 1/2 号线业务<b>不需要批次锁定</b>，可走标准货到人模式。半月数据显示日均 ~30 单、平均 17 行/单、2.8 件/行 — <b>典型拆零拣选</b>，AMR + 料架将 60% 的走动时间消灭，是 ROI 最高的环节。
+          </div>
+        </div>
+      </div>
+
+      <!-- B2 区：3 号线 一单一件 + 批次锁定 -->
+      <div class="zone-card">
+        <div class="zone-card-head zoneB2">
+          <span class="zone-tag" style="background:rgba(245,216,156,0.25);color:var(--gold-l);">ZONE B2 · ⚠ 高难度</span>
+          <h3>3 号线专用 · 一单一件 · 强批次</h3>
+          <div class="zone-meta">
+            <span>SKU<strong>~450</strong></span>
+            <span>面积<strong>~220 ㎡</strong></span>
+            <span>流量占比<strong>~15%</strong></span>
+          </div>
+        </div>
+        <div class="zone-body">
+          <h4>业务特性</h4>
+          <div class="zone-rationale" style="background:#FEF3C7;border-color:var(--amber);margin-top:0;margin-bottom:14px;">
+            柳工 3 号线 <b>所有 SKU 必须按指定批次出库</b>。基本一单一件 → 错件代价极大（整单作废）。同一 SKU 不同批次的料盒必须严格物理隔离。
+          </div>
+          <h4>核心设备</h4>
+          <ul class="equip-list">
+            <li>
+              <span class="equip-name"><b>潜伏式 AMR</b>（专用车队）
+                <span class="equip-spec">独立调度池，避免与 B1 任务混用</span>
+              </span>
+              <span class="equip-qty">2–3 台</span>
+            </li>
+            <li>
+              <span class="equip-name"><b>批次专用料架</b>（按批次贴标）
+                <span class="equip-spec">每批次独立料盒，料架贴 RFID 批次标签</span>
+              </span>
+              <span class="equip-qty">~100 个</span>
+            </li>
+            <li>
+              <span class="equip-name"><b>强复核拣选工作站</b>
+                <span class="equip-spec">双重扫码（SKU 条码 + 批次/CID）<br>Pick-to-Light 显示批次号<br>不扫批次无法确认</span>
+              </span>
+              <span class="equip-qty">1–2 个</span>
+            </li>
+            <li>
+              <span class="equip-name"><b>AI 视觉复核</b>（批次识别）
+                <span class="equip-spec">在工作站集成，识别料号 + 批次标签 + 数量</span>
+              </span>
+              <span class="equip-qty">100% 覆盖</span>
+            </li>
+          </ul>
+          <h4>选型依据</h4>
+          <div class="zone-rationale">
+            <b>物理隔离 + 流程强化</b> 是降低错件风险的唯一办法。把 3 号线物理上隔开在 B 区下半部，AMR 专车专用，工作站强制双重扫码 — 不通过则系统不允许出库。<b>这是整个仓库错件防护最严密的一个角落</b>，宁可降低效率也要保证零错件。
+          </div>
+        </div>
+      </div>
+
+      <!-- C 区 -->
+      <div class="zone-card">
+        <div class="zone-card-head zoneC">
+          <span class="zone-tag">ZONE C</span>
+          <h3>小件长尾储存</h3>
+          <div class="zone-meta">
+            <span>SKU<strong>~4,600</strong></span>
+            <span>面积<strong>~750 + 750 ㎡</strong></span>
+            <span>流量占比<strong>~10%</strong></span>
+          </div>
+        </div>
+        <div class="zone-body">
+          <h4>核心设备</h4>
+          <ul class="equip-list">
+            <li>
+              <span class="equip-name"><b>Mezzanine 钢平台</b>（2 层）
+                <span class="equip-spec">利用 8m 净高，地面 + 4m 处增设 1 层平台，作业总面积翻倍</span>
+              </span>
+              <span class="equip-qty">~750 ㎡</span>
+            </li>
+            <li>
+              <span class="equip-name"><b>中型货架</b>（4 层）
+                <span class="equip-spec">螺栓装配式，单层 200 kg，4600 个料盒位</span>
+              </span>
+              <span class="equip-qty">~70 组</span>
+            </li>
+            <li>
+              <span class="equip-name"><b>拣选车 + 手持 PDA</b>
+                <span class="equip-spec">人工拣选；扫码引导，RFID 自动核对</span>
+              </span>
+              <span class="equip-qty">4–6 套</span>
+            </li>
+          </ul>
+          <h4>选型依据</h4>
+          <div class="zone-rationale">
+            长尾 SKU 流量低、价值密度低，<b>不值得上 AGV/AMR</b>。但 4,600 SKU 占地面积大，必须用 <b>Mezzanine 夹层</b> 把垂直空间利用起来——这是 8m 净高最划算的用法。设备投资低、可拆迁、平台本身可以二手出售。
+          </div>
+        </div>
+      </div>
+
+      <!-- D 区 -->
+      <div class="zone-card">
+        <div class="zone-card-head zoneD">
+          <span class="zone-tag">ZONE D</span>
+          <h3>长形件储存</h3>
+          <div class="zone-meta">
+            <span>SKU<strong>~400</strong></span>
+            <span>面积<strong>~320 ㎡</strong></span>
+            <span>流量占比<strong>~5%</strong></span>
+          </div>
+        </div>
+        <div class="zone-body">
+          <h4>核心设备</h4>
+          <ul class="equip-list">
+            <li>
+              <span class="equip-name"><b>悬臂式货架</b>
+                <span class="equip-spec">单臂承重 200 kg，臂长 1.5m；支持 0.5–2m 长形件</span>
+              </span>
+              <span class="equip-qty">~16 组（80 臂）</span>
+            </li>
+            <li>
+              <span class="equip-name"><b>叉车 / 人工搬运车</b>
+                <span class="equip-spec">沿用现有设备</span>
+              </span>
+              <span class="equip-qty">复用</span>
+            </li>
+          </ul>
+          <h4>选型依据</h4>
+          <div class="zone-rationale">
+            连接管、线束等长形件<b>不适合任何自动化方案</b>—— AGV 抓不稳、AMR 装不下、ASRS 货位规格不匹配。强行做反而增加投资、降低效率。保留 <b>人工 + 悬臂货架</b>，把自动化投资留给真正能见效的 A/B 区。
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Section 3: 集货 + 复核 + 发货 ============ -->
+  <section>
+    <div class="section-head">
+      <h2><span class="num">03</span> 集货 · 复核 · 发货环节</h2>
+      <div class="desc">JIT 配送时窗紧、错件代价高，复核环节比拣货环节更"输不起"——这是软件 + 视觉 AI 的核心战场。</div>
+    </div>
+
+    <div class="invest-table-wrap">
+      <table class="invest">
+        <thead>
+          <tr>
+            <th style="width:32%;">环节 / 设备</th>
+            <th style="width:43%;">技术要点</th>
+            <th style="width:13%;">数量</th>
+            <th style="width:12%;">投资量级</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="item-name"><b>集货缓冲区</b><small>各区拣选完成的订单暂存</small></td>
+            <td>分订单号定位的缓冲料架；按月台方向预排队</td>
+            <td>≈ 600 ㎡</td>
+            <td class="price-cell">≈ 15 万</td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>AI 视觉复核工作站</b><small>必上 · 错件直接影响产线停线</small></td>
+            <td>多角度相机 + AI 识别（料号、数量、外观）；与 WMS 配送单实时比对</td>
+            <td>3 套</td>
+            <td class="price-cell">≈ 90 万</td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>RFID 龙门架</b><small>必上 · CID/批次/工位多重追溯</small></td>
+            <td>装在发货前最后一关，整车扫描；与柳工 MES 实时回传</td>
+            <td>2 套</td>
+            <td class="price-cell">≈ 40 万</td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>Pick-to-Light 分拣系统</b><small>多单合并出货时分流</small></td>
+            <td>按订单号灯光提示，工人放入对应客户/工位的集货位</td>
+            <td>1 套（12 位）</td>
+            <td class="price-cell">≈ 25 万</td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>液压登车桥</b><small>仓库无高位月台 → 必装</small></td>
+            <td>克服月台 0mm 高度差；4 个月台各配 1 台</td>
+            <td>4 台</td>
+            <td class="price-cell">≈ 32 万</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ Section 4: 投资估算与可迁移性 ============ -->
+  <section>
+    <div class="section-head">
+      <h2><span class="num">04</span> 总投资估算与可迁移性</h2>
+      <div class="desc">按软件/设备/改造三层投资分解，标注每项设备的可迁移性。残值率 = 假设 3-5 年后迁移时的二手回收价值。</div>
+    </div>
+
+    <div class="invest-table-wrap">
+      <table class="invest">
+        <thead>
+          <tr>
+            <th style="width:30%;">投资项</th>
+            <th style="width:32%;">说明</th>
+            <th style="width:14%;">投资量级</th>
+            <th style="width:12%;">残值率</th>
+            <th style="width:12%;">可迁移性</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 软件层 -->
+          <tr class="layer-row">
+            <td class="layer-label">🖥 软件层</td>
+            <td colspan="4" style="color:var(--text-mid);font-size:12px;">100% 可迁移 · 投资重头</td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>WMS</b> 仓储管理系统</td>
+            <td>支持 CID/批次/工位多维管理；多客户/多产线</td>
+            <td class="price-cell">120 万</td>
+            <td>—</td>
+            <td><span class="mov-pill mov-100">100%</span></td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>TMS</b> 运输管理系统</td>
+            <td>承运商管理、GPS 跟踪、电子签收</td>
+            <td class="price-cell">40 万</td>
+            <td>—</td>
+            <td><span class="mov-pill mov-100">100%</span></td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>AI 调度系统</b></td>
+            <td>AGV/AMR 群调度、拣选路径优化、预测维护</td>
+            <td class="price-cell">80 万</td>
+            <td>—</td>
+            <td><span class="mov-pill mov-100">100%</span></td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>数据中台 + MES 接口</b></td>
+            <td>与柳工 1/2/3 号线 MES 直连，工位级配送</td>
+            <td class="price-cell">60 万</td>
+            <td>—</td>
+            <td><span class="mov-pill mov-100">100%</span></td>
+          </tr>
+          <tr style="background:#FBF5E9;">
+            <td colspan="2" style="font-weight:700;color:var(--navy);">软件层小计</td>
+            <td class="price-cell">≈ 300 万</td>
+            <td>—</td>
+            <td><span class="mov-pill mov-100">100%</span></td>
+          </tr>
+
+          <!-- 设备层 -->
+          <tr class="layer-row">
+            <td class="layer-label">🤖 设备层</td>
+            <td colspan="4" style="color:var(--text-mid);font-size:12px;">标准化、模块化 · 残值率 ≥ 60%</td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>A 区</b> 重型货架 + 托盘 AGV</td>
+            <td>5 层货架 × 960 位 + 3-4 台 SLAM AGV</td>
+            <td class="price-cell">150 万</td>
+            <td>70%</td>
+            <td><span class="mov-pill mov-high">高</span></td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>B1 区</b> 普通货到人 AMR</td>
+            <td>3-5 台 AMR + 120 个料架 + 2 工作站</td>
+            <td class="price-cell">170 万</td>
+            <td>65%</td>
+            <td><span class="mov-pill mov-high">高</span></td>
+          </tr>
+          <tr style="background:#FEF3C7;">
+            <td class="item-name"><b>B2 区</b> 批次锁定 AMR + AI 视觉
+              <small>⚠ 3 号线一单一件、强批次锁定</small>
+            </td>
+            <td>2-3 台 AMR + 100 个批次专用料架 + 1-2 强复核工作站 + AI 视觉批次识别</td>
+            <td class="price-cell">230 万</td>
+            <td>55%</td>
+            <td><span class="mov-pill mov-mid">中</span></td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>C 区</b> Mezzanine + 中型货架</td>
+            <td>750㎡ 钢平台 + 70 组货架</td>
+            <td class="price-cell">75 万</td>
+            <td>40%</td>
+            <td><span class="mov-pill mov-mid">中</span></td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>D 区</b> 悬臂货架</td>
+            <td>16 组悬臂式货架</td>
+            <td class="price-cell">15 万</td>
+            <td>50%</td>
+            <td><span class="mov-pill mov-high">高</span></td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>集货 / 复核 / 发货</b> 设备</td>
+            <td>AI 视觉 + RFID + PTL + 登车桥</td>
+            <td class="price-cell">170 万</td>
+            <td>55%</td>
+            <td><span class="mov-pill mov-high">高</span></td>
+          </tr>
+          <tr style="background:#FBF5E9;">
+            <td colspan="2" style="font-weight:700;color:var(--navy);">设备层小计</td>
+            <td class="price-cell">≈ 810 万</td>
+            <td>≈ 60%</td>
+            <td><span class="mov-pill mov-high">高</span></td>
+          </tr>
+
+          <!-- 改造层 -->
+          <tr class="layer-row">
+            <td class="layer-label">🔧 改造层</td>
+            <td colspan="4" style="color:var(--text-mid);font-size:12px;">最小化、可逆 · 尽量无痕</td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>工业 WiFi 部署</b></td>
+            <td>覆盖全仓 · 工业级 AP 落地支架式</td>
+            <td class="price-cell">22 万</td>
+            <td>30%</td>
+            <td><span class="mov-pill mov-mid">中</span></td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>电气增容 / 线缆</b></td>
+            <td>支持 AGV 群充电 + 工作站用电</td>
+            <td class="price-cell">18 万</td>
+            <td>10%</td>
+            <td><span class="mov-pill mov-low">低</span></td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>地面局部修补</b></td>
+            <td>平整度差点位修补（不做自流平）</td>
+            <td class="price-cell">10 万</td>
+            <td>0%</td>
+            <td><span class="mov-pill mov-low">不可</span></td>
+          </tr>
+          <tr>
+            <td class="item-name"><b>照明优化</b></td>
+            <td>拣货区灯光提升至 ≥ 300 lux</td>
+            <td class="price-cell">5 万</td>
+            <td>20%</td>
+            <td><span class="mov-pill mov-low">低</span></td>
+          </tr>
+          <tr style="background:#FBF5E9;">
+            <td colspan="2" style="font-weight:700;color:var(--navy);">改造层小计</td>
+            <td class="price-cell">≈ 55 万</td>
+            <td>≈ 15%</td>
+            <td><span class="mov-pill mov-low">低</span></td>
+          </tr>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2">总投资估算（不含税）</td>
+            <td>≈ 1,165 万</td>
+            <td colspan="2">综合残值率 ≈ 50%</td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <p style="font-size:12px;color:var(--text-lt);margin-top:14px;">
+      ※ 投资金额为方向性估算（±20% 浮动），最终金额以详细方案与供应商报价为准。
+      ※ 残值率 = 假设 3-5 年后迁移时的二手回收价值占原价比例；软件投资可 100% 迁移。
+      ※ 软硬比例：软件层 26% · 设备层 69% · 改造层 5% ← 软件层占比上升 — 投资规模缩减时软件不变，更体现"软件重"。
+    </p>
+  </section>
+
+  <!-- ============ Section 5: 分期实施 ============ -->
+  <section>
+    <div class="section-head">
+      <h2><span class="num">05</span> 分期实施路径</h2>
+      <div class="desc">软件先行、设备分批、AI 持续迭代。每一阶段都能独立见效，且为下一阶段铺路。</div>
+    </div>
+
+    <div class="roadmap">
+      <div class="phase">
+        <div class="phase-num">01</div>
+        <span class="phase-tag">FOUNDATION</span>
+        <h3>数字底座 + 流程标准化</h3>
+        <div class="span">第 1–6 个月</div>
+        <ul>
+          <li>WMS / TMS 上线、货位编码细化</li>
+          <li>工位器具标准化（统一托盘规格）</li>
+          <li>手持 PDA + RFID 试点</li>
+          <li>入出库流程重构</li>
+          <li>工业 WiFi 部署</li>
+        </ul>
+        <div class="phase-investment">
+          <span>本期投资</span><strong>≈ 320 万</strong>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-num">02</div>
+        <span class="phase-tag">AUTOMATE</span>
+        <h3>核心区自动化设备投入</h3>
+        <div class="span">第 7–18 个月</div>
+        <ul>
+          <li><b>A 区</b>：5 层货架 + 托盘 AGV</li>
+          <li><b>B1 区</b>：柳工 1/2 号线 AMR 货到人</li>
+          <li><b>B2 区</b>：柳工 3 号线批次锁定 + AI 视觉复核</li>
+          <li>集货 + AI 复核 + RFID 龙门架</li>
+          <li>液压登车桥安装</li>
+          <li>AI 调度系统初步上线</li>
+        </ul>
+        <div class="phase-investment">
+          <span>本期投资</span><strong>≈ 750 万</strong>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-num">03</div>
+        <span class="phase-tag">REPLICATE</span>
+        <h3>长尾覆盖 + 通用化复制</h3>
+        <div class="span">第 19–30 个月</div>
+        <ul>
+          <li><b>C 区</b>：Mezzanine 夹层 + 中型货架</li>
+          <li><b>D 区</b>：悬臂货架</li>
+          <li>AI 决策闭环完善</li>
+          <li>试点经验沉淀为模板</li>
+          <li>向其他节点平移复制</li>
+        </ul>
+        <div class="phase-investment">
+          <span>本期投资</span><strong>≈ 95 万</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Section 6: ASRS 选型对比 ============ -->
+  <section>
+    <div class="section-head">
+      <h2><span class="num">06</span> ASRS / Shuttle / AMR 选型对比</h2>
+      <div class="desc">回答"为什么柳工不上 ASRS"——三种方案直观对比。</div>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-card worst">
+        <h4>方案 ① · 全 ASRS 覆盖</h4>
+        <div class="verdict">✗ 不推荐</div>
+        <div class="compare-meta">
+          <div>投资估算<b>≈ 2,500-3,500 万</b></div>
+          <div>残值率<b>≤ 30%</b></div>
+          <div>回收期<b>&gt; 6 年</b></div>
+          <div>可迁移性<b>极差</b></div>
+        </div>
+        <div class="body">
+          <b>致命问题</b>：柳工 6,800 SKU + 长尾极重 + 拆零拣选为主，ASRS 的"高密度单元化"基因完全不匹配。投资大、回收慢、搬不动，是典型的"为对标而对标"的反面案例。
+        </div>
+      </div>
+
+      <div class="compare-card worst">
+        <h4>方案 ② · Shuttle 驶入式</h4>
+        <div class="verdict">✗ 不推荐</div>
+        <div class="compare-meta">
+          <div>投资估算<b>≈ 800-1,200 万</b></div>
+          <div>残值率<b>≤ 35%</b></div>
+          <div>回收期<b>&gt; 5 年</b></div>
+          <div>可迁移性<b>差</b></div>
+        </div>
+        <div class="body">
+          <b>致命问题</b>：Shuttle 驶入式适合"少品类大批量缓冲库存"，而柳工是"多品类小批量 JIT 配送"，业务模式完全相反。强行使用 → 拆零灾难、出库需重组、效率反而下降。
+        </div>
+      </div>
+
+      <div class="compare-card best">
+        <h4>方案 ③ · 五区混合（推荐）</h4>
+        <div class="verdict">✓ 推荐</div>
+        <div class="compare-meta">
+          <div>投资估算<b>≈ 1,165 万</b></div>
+          <div>残值率<b>≈ 50%</b></div>
+          <div>回收期<b>≈ 3 年</b></div>
+          <div>可迁移性<b>强</b></div>
+        </div>
+        <div class="body">
+          <b>核心优势</b>：每个 SKU 类别都用最匹配的方案，不浪费投资。设备模块化、软件 100% 可迁移，搬到新仓库后核心能力保留。可分期实施，第一阶段就能见效。
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <p><span class="gold">柳工配件库智能化升级项目</span> · 自动化布局方案 v0.1 · 2026.05</p>
+  <p style="opacity:0.6;font-size:11px;">本文件基于现场调研数据 + 业务模式分析。最终方案以详细技术评审为准。</p>
+</footer>
+
+</body>
+</html>
